@@ -1,2 +1,36 @@
-<app-navbar></app-navbar>
-<p>employee-dashboard works!</p>
+<div class="employee-dashboard">
+  <h1>Welcome, {{ employeeData.profile.name }}</h1>
+  
+  <section>
+    <h2>Profile</h2>
+    <p><strong>Username:</strong> {{ employeeData.profile.user?.username }}</p>
+    <p><strong>Role:</strong> {{ employeeData.profile.user?.role }}</p>
+  </section>
+
+  <section>
+    <h2>Classes Taught</h2>
+    <ul>
+      <li *ngFor="let cls of employeeData.classesTaught">{{ cls }}</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Salary Details</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let salary of employeeData.salaries">
+          <td>{{ salary.id }}</td>
+          <td>{{ salary.salaryAmount | currency }}</td>
+          <td>{{ salary.createdDate | date:'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
