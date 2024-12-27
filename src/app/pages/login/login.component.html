@@ -1,0 +1,11 @@
+<div class="login">
+    <div class="login-triangle"></div>
+
+    <h2 class="login-header">Log in</h2>
+
+    <form class="login-container" (ngSubmit)="onLogin()">
+        <p><input type="text" placeholder="username" [(ngModel)]="loginObject.username" name="username"></p>
+        <p><input type="password" placeholder="Password" [(ngModel)]="loginObject.password" name="password"></p>
+        <button class="btn btn-primary" type="submit" value="Submit">log in</button>
+    </form>
+</div>
