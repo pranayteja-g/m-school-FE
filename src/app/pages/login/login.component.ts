@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   loginObject: login;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, public authService: AuthService) {
     this.loginObject = new login('', '');
   }
 
@@ -23,6 +24,10 @@ export class LoginComponent {
         alert('Login successful!');
         localStorage.removeItem('token');
         localStorage.setItem('token', res);
+
+        this.authService.startTokenExpirationCheck(); // Start checking token expiration
+        console.log('in logged in, checking for token expiration...');
+        
 
         const role = this.getRoleFromToken(res);
 
