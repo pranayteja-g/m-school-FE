@@ -1,31 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ExamresultService } from '../../services/admin/examresult.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-examresults',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './examresults.component.html',
   styleUrl: './examresults.component.css'
 })
-export class ExamresultsComponent {
-  // @Input() examResults: any[] = [];
-  @Input() studentId: number = 0; // Pass the student ID as input to the component
+export class ExamresultsComponent implements OnInit{
+  studentId: number = 0; // Bind this to the input field
+  examResultsForStudentId: any[] = [];
   examResults: any[] = [];
   currentPage: number = 0;
   pageSize: number = 10;
   totalPages: number = 0;
-  constructor(private examResultService: ExamresultService) {
-    this.examResults = [];
-  }
+
+  constructor(private examResultService: ExamresultService) { }
   ngOnInit(): void {
-    if (this.studentId > 0) {
-      this.getAllExamResults(this.studentId, this.currentPage, this.pageSize);
-    }
+    this.fetchExamResults();
   }
 
-  getAllExamResults(studentId: number, page: number, size: number): void {
-    this.examResultService.getAllExamResults(studentId, page, size).subscribe({
+  fetchExamResults(): void {
+    this.examResultService.getExamResults(this.currentPage, this.pageSize).subscribe({
       next: (data) => {
         this.examResults = data.content || [];
         this.totalPages = data.totalPages || 0;
@@ -34,5 +32,29 @@ export class ExamresultsComponent {
         console.error('Error fetching exam results:', err);
       }
     });
+  }
+
+  getAllExamResultsByStudentId(): void {
+    if (this.studentId > 0) {
+      this.examResultService.getAllExamResultsByStudentId(this.studentId, this.currentPage, this.pageSize).subscribe({
+        next: (data) => {
+          this.examResultsForStudentId = data.content || [];
+          this.totalPages = data.totalPages || 0;
+        },
+        error: (err) => {
+          console.error('Error fetching exam results:', err);
+        }
+      });
+    } else {
+      console.warn('Please enter a valid Student ID');
+    }
+  }
+
+  changePage(offset: number): void {
+    const newPage = this.currentPage + offset;
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.currentPage = newPage;
+      this.getAllExamResultsByStudentId();
+    }
   }
 }

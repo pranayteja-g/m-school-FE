@@ -15,7 +15,14 @@ export class ExamresultService {
     return this.http.post<ExamResult[]>(`${this.baseUrl}/create`, examResult);
   }
 
-  getAllExamResults(studentId: number, page: number, size: number): Observable<any> {
+  getExamResults(page: number, size: number): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<any>(`http://localhost:8080/results/getall`, { params });
+  }
+
+  getAllExamResultsByStudentId(studentId: number, page: number, size: number): Observable<any> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -37,4 +44,9 @@ export interface ExamResult {
   examType: string;
   marksObtained: number;
   totalMarks: number;
+}
+
+export interface Student {
+  id: number;
+  name: string;
 }

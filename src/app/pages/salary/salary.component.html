@@ -1,17 +1,34 @@
-<table>
-    <thead>
-      <tr>
-        <th>Salary ID</th>
-        <th>Amount</th>
-        <th>Month</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let salary of salaries">
-        <td>{{ salary.id }}</td>
-        <td>{{ salary.amount }}</td>
-        <td>{{ salary.month }}</td>
-      </tr>
-    </tbody>
-  </table>
-  
+<div class="salary-container">
+  <h2>Employee Salary Details</h2>
+
+  <div>
+    <h3>Search Salary by Employee ID</h3>
+    <label for="employeeId">Employee ID:</label>
+    <!-- trigger search on imput change -->
+    <input [(ngModel)]="employeeId" name="employeeId" type="number" (input)="getSalaryByEmployeeId()" />
+  </div>
+
+
+  <div>
+    <h3>Filter Salaries by Date Range</h3>
+    <label for="startDate">Start Date:</label>
+    <input [(ngModel)]="startDate" name="startDate" type="date" />
+    <label for="endDate">End Date:</label>
+    <input [(ngModel)]="endDate" name="endDate" type="date" />
+    <button (click)="filterSalariesByDate()">Filter</button>
+  </div>
+
+  <div *ngIf="salaries.length > 0">
+    <h3>Salary Records</h3>
+    <ul>
+      <li *ngFor="let salary of salaries">
+        ID: {{ salary.id }}, Employee ID: {{ salary.employeeId }}, Amount: {{ salary.amount }} <br />
+        Date: {{ salary.createdDate | date:'yyyy-MM-dd' }}, Status: {{ salary.status }}
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="salaries.length === 0">
+    <p>No salaries found.</p>
+  </div>
+</div>

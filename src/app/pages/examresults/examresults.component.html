@@ -1,4 +1,10 @@
-<table>
+<div>
+  <label for="studentId">Enter Student ID:</label>
+  <input type="number" id="studentId" [(ngModel)]="studentId" />
+  <button (click)="getAllExamResultsByStudentId()">Get Results</button>
+</div>
+
+<table *ngIf="examResults.length > 0">
   <thead>
     <tr>
       <th>Student ID</th>
@@ -9,8 +15,8 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let result of examResults">
-      <td>{{ studentId}}</td>
+    <tr *ngFor="let result of examResultsForStudentId">
+      <td>{{ studentId }}</td>
       <td>{{ result.examType }}</td>
       <td>{{ result.marksObtained }}</td>
       <td>{{ result.totalMarks }}</td>
@@ -18,9 +24,48 @@
     </tr>
   </tbody>
 </table>
+
 <div *ngIf="totalPages > 1">
-  <button (click)="getAllExamResults(studentId, currentPage - 1, pageSize)"
-    [disabled]="currentPage === 0">Previous</button>
-  <button (click)="getAllExamResults(studentId, currentPage + 1, pageSize)"
-    [disabled]="currentPage === totalPages - 1">Next</button>
+  <button (click)="changePage(-1)" [disabled]="currentPage === 0">Previous</button>
+  <button (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">Next</button>
+</div>
+
+<div *ngIf="examResults.length === 0 && studentId > 0">
+  <p>No exam results found for Student ID: {{ studentId }}</p>
+</div>
+
+
+
+<div>
+  <h3>Exam Results</h3>
+</div>
+
+<table *ngIf="examResults.length > 0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Student ID</th>
+      <th>Exam Type</th>
+      <th>Marks Obtained</th>
+      <th>Total Marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let result of examResults">
+      <td>{{ result.id }}</td>
+      <td>{{ result.studentId }}</td>
+      <td>{{ result.examType }}</td>
+      <td>{{ result.marksObtained }}</td>
+      <td>{{ result.totalMarks }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="totalPages > 1">
+  <button (click)="changePage(-1)" [disabled]="currentPage === 0">Previous</button>
+  <button (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">Next</button>
+</div>
+
+<div *ngIf="examResults.length === 0">
+  <p>No exam results available.</p>
 </div>
