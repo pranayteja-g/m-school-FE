@@ -1,1 +1,97 @@
-<p>student works!</p>
+<div class="container">
+    <h2>Manage Student</h2>
+
+    <!-- Student Create Form -->
+    <div class="form-group">
+        <h3>Create Student</h3>
+        <form (ngSubmit)="createStudent()">
+            <div class="form-group">
+                <label for="name">Student Name</label>
+                <input type="text" id="name" class="form-control" [(ngModel)]="studentName" name="name" required />
+            </div>
+
+            <div class="form-group">
+                <label for="class">Class</label>
+                <input type="text" id="class" class="form-control" [(ngModel)]="studentClass" name="class" required />
+            </div>
+
+            <div class="form-group">
+                <label for="section">Section</label>
+                <input type="text" id="section" class="form-control" [(ngModel)]="section" name="section" required />
+            </div>
+
+            <div class="form-group">
+                <label for="rollNo">Roll No</label>
+                <input type="text" id="rollNo" class="form-control" [(ngModel)]="rollNo" name="rollNo" required />
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" [(ngModel)]="username" name="username" required />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" [(ngModel)]="password" name="password"
+                    required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Student</button>
+        </form>
+    </div>
+
+    <!-- Search Student by Name -->
+    <div class="form-group">
+        <h3>Search Student by Name</h3>
+        <form (ngSubmit)="searchStudentsByName()">
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" class="form-control" [(ngModel)]="studentName" name="studentName"
+                    required />
+            </div>
+            <button type="submit" class="btn btn-info">Search Student</button>
+        </form>
+    </div>
+
+    <!-- Display Search Results -->
+    <div *ngIf="studentsByName.length > 0">
+        <h3>Students Found:</h3>
+        <ul>
+            <li *ngFor="let student of studentsByName">
+                {{ student.name }} - {{ student.studentClass }} ({{ student.rollNo }})
+            </li>
+        </ul>
+    </div>
+    <div *ngIf="studentsByName.length === 0 && message">
+        <p>{{ message }}</p>
+    </div>
+
+
+    <!-- Student Update Form -->
+    <div class="form-group">
+        <h3>Update Student</h3>
+        <form (ngSubmit)="updateStudent()">
+            <div class="form-group">
+                <label for="studentId">Student ID</label>
+                <input type="number" id="studentId" class="form-control" [(ngModel)]="studentId" name="studentId"
+                    required />
+            </div>
+
+            <!-- Repeat the same fields as above for updating -->
+            <!-- Copy and modify the fields from Create form here for Update -->
+
+            <button type="submit" class="btn btn-warning">Update Student</button>
+        </form>
+    </div>
+
+    <!-- Delete Student -->
+    <div class="form-group">
+        <h3>Delete Student</h3>
+        <button class="btn btn-danger" (click)="deleteStudent()">Delete Student</button>
+    </div>
+
+    <!-- Message Display -->
+    <div *ngIf="message" class="alert alert-info">
+        {{ message }}
+    </div>
+</div>

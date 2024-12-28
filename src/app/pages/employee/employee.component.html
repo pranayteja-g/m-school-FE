@@ -1,1 +1,104 @@
-<p>employee works!</p>
+<!-- Create Employee Form -->
+<div class="form-group">
+    <h3>Create Employee</h3>
+    <form (ngSubmit)="createEmployee()" #createEmployeeForm="ngForm">
+      <div class="form-group">
+        <label for="employeeName">Employee Name</label>
+        <input type="text" class="form-control" id="employeeName" [(ngModel)]="employeeName" name="employeeName" required #employeeNameInput="ngModel" />
+        <div *ngIf="employeeNameInput.invalid && employeeNameInput.touched" class="text-danger">Employee name is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeeUsername">Username</label>
+        <input type="text" class="form-control" id="employeeUsername" [(ngModel)]="employeeUsername" name="employeeUsername" required #employeeUsernameInput="ngModel" />
+        <div *ngIf="employeeUsernameInput.invalid && employeeUsernameInput.touched" class="text-danger">Username is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeePassword">Password</label>
+        <input type="password" class="form-control" id="employeePassword" [(ngModel)]="employeePassword" name="employeePassword" required #employeePasswordInput="ngModel" />
+        <div *ngIf="employeePasswordInput.invalid && employeePasswordInput.touched" class="text-danger">Password is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeeRole">Role</label>
+        <input type="text" class="form-control" id="employeeRole" [(ngModel)]="employeeRole" name="employeeRole" required #employeeRoleInput="ngModel" />
+        <div *ngIf="employeeRoleInput.invalid && employeeRoleInput.touched" class="text-danger">Role is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" class="form-control" id="subject" [(ngModel)]="subject" name="subject" required #subjectInput="ngModel" />
+        <div *ngIf="subjectInput.invalid && subjectInput.touched" class="text-danger">Subject is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="classesTaught">Classes Taught</label>
+        <input type="text" class="form-control" id="classesTaught" [(ngModel)]="classesTaughtString" name="classesTaught" placeholder="Enter classes separated by commas" />
+        <div *ngIf="classesTaughtString && classesTaughtString.length > 0">
+            Classes will be split into an array when submitted.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="createEmployeeForm.invalid">Create Employee</button>
+    </form>
+</div>
+
+<!-- Update Employee Form -->
+<div class="form-group">
+    <h3>Update Employee</h3>
+    <form (ngSubmit)="updateEmployee()" #updateEmployeeForm="ngForm">
+      <div class="form-group">
+        <label for="employeeId">Employee ID</label>
+        <input type="number" class="form-control" id="employeeId" [(ngModel)]="employeeId" name="employeeId" required #employeeIdInput="ngModel" />
+        <div *ngIf="employeeIdInput.invalid && employeeIdInput.touched" class="text-danger">Employee ID is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeeName">Employee Name</label>
+        <input type="text" class="form-control" id="employeeName" [(ngModel)]="employeeName" name="employeeName" required #employeeNameInput="ngModel" />
+        <div *ngIf="employeeNameInput.invalid && employeeNameInput.touched" class="text-danger">Employee name is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeeUsername">Username</label>
+        <input type="text" class="form-control" id="employeeUsername" [(ngModel)]="employeeUsername" name="employeeUsername" required #employeeUsernameInput="ngModel" />
+        <div *ngIf="employeeUsernameInput.invalid && employeeUsernameInput.touched" class="text-danger">Username is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeePassword">Password</label>
+        <input type="password" class="form-control" id="employeePassword" [(ngModel)]="employeePassword" name="employeePassword" required #employeePasswordInput="ngModel" />
+        <div *ngIf="employeePasswordInput.invalid && employeePasswordInput.touched" class="text-danger">Password is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="employeeRole">Role</label>
+        <input type="text" class="form-control" id="employeeRole" [(ngModel)]="employeeRole" name="employeeRole" required #employeeRoleInput="ngModel" />
+        <div *ngIf="employeeRoleInput.invalid && employeeRoleInput.touched" class="text-danger">Role is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" class="form-control" id="subject" [(ngModel)]="subject" name="subject" required #subjectInput="ngModel" />
+        <div *ngIf="subjectInput.invalid && subjectInput.touched" class="text-danger">Subject is required.</div>
+      </div>
+      <div class="form-group">
+        <label for="classesTaught">Classes Taught</label>
+        <input type="text" class="form-control" id="classesTaught" [(ngModel)]="classesTaughtString" name="classesTaught" placeholder="Enter classes separated by commas" />
+        <div *ngIf="classesTaughtString && classesTaughtString.length > 0">
+            Classes will be split into an array when submitted.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-info" [disabled]="updateEmployeeForm.invalid">Update Employee</button>
+    </form>
+</div>
+
+<!-- Display Message -->
+<div *ngIf="message">
+  <p>{{ message }}</p>
+</div>
+
+<!-- Delete Employee -->
+<div class="form-group">
+  <button class="btn btn-danger" (click)="deleteEmployee()">Delete Employee</button>
+</div>
+
+<!-- List all Employees -->
+<div *ngIf="allEmployees.length > 0">
+  <h3>All Employees:</h3>
+  <ul>
+    <li *ngFor="let employee of allEmployees">
+      {{ employee.name }} ({{ employee.username }}) - {{ employee.role }}
+    </li>
+  </ul>
+</div>
