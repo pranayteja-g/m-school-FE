@@ -1,0 +1,17 @@
+<table>
+    <thead>
+      <tr>
+        <th>Fee ID</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fee of fees">
+        <td>{{ fee.id }}</td>
+        <td>{{ fee.amount }}</td>
+        <td>{{ fee.status }}</td>
+      </tr>
+    </tbody>
+  </table>
+  

@@ -1,0 +1,26 @@
+<table>
+  <thead>
+    <tr>
+      <th>Student ID</th>
+      <th>Exam Type</th>
+      <th>Marks Obtained</th>
+      <th>Total Marks</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let result of examResults">
+      <td>{{ studentId}}</td>
+      <td>{{ result.examType }}</td>
+      <td>{{ result.marksObtained }}</td>
+      <td>{{ result.totalMarks }}</td>
+      <td>{{ result.date }}</td>
+    </tr>
+  </tbody>
+</table>
+<div *ngIf="totalPages > 1">
+  <button (click)="getAllExamResults(studentId, currentPage - 1, pageSize)"
+    [disabled]="currentPage === 0">Previous</button>
+  <button (click)="getAllExamResults(studentId, currentPage + 1, pageSize)"
+    [disabled]="currentPage === totalPages - 1">Next</button>
+</div>

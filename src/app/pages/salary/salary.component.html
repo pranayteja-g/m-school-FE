@@ -1,0 +1,17 @@
+<table>
+    <thead>
+      <tr>
+        <th>Salary ID</th>
+        <th>Amount</th>
+        <th>Month</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let salary of salaries">
+        <td>{{ salary.id }}</td>
+        <td>{{ salary.amount }}</td>
+        <td>{{ salary.month }}</td>
+      </tr>
+    </tbody>
+  </table>
+  
