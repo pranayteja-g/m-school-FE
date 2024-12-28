@@ -15,8 +15,16 @@ export class FeeService {
     return this.http.post<Fee[]>(`${this.baseUrl}/f/create`, fee);
   }
 
+  getAllFees() {
+    return this.http.get<Fee[]>(`${this.baseUrl}/f/all`);
+  }
+
+  getStudentFees(studentId: number) {
+    return this.http.get<Fee[]>(`http://localhost:8080/student/fees/${studentId}`);
+  }
+
   updateFee(fee: Fee) {
-    return this.http.put<Fee[]>(`${this.baseUrl}/f/update/\${fee.id}`, fee);
+    return this.http.put<Fee[]>(`${this.baseUrl}/f/update/${fee.id}`, fee);
   }
 
   deleteFee(feeId: number) {
@@ -31,6 +39,8 @@ export interface Fee {
   id: number;
   studentId: number;
   feeType: string;
-  amount: number;
-  status: string;
+  totalAmount: number
+  paidAmount: number
+  dueAmount: number
+
 }

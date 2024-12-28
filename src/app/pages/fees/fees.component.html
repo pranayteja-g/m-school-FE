@@ -1,17 +1,32 @@
-<table>
+<div class="fees-container">
+  <h2>Fees List</h2>
+
+  <!-- Display loading message if fees are not yet fetched -->
+  <div *ngIf="fees.length === 0">No fees found.</div>
+
+  <!-- Table for displaying the list of fees -->
+  <table *ngIf="fees.length > 0" class="fees-table">
     <thead>
       <tr>
-        <th>Fee ID</th>
-        <th>Amount</th>
-        <th>Status</th>
+        <th>Fee Type</th>
+        <th>Total Amount</th>
+        <th>Paid Amount</th>
+        <th>Due Amount</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let fee of fees">
-        <td>{{ fee.id }}</td>
-        <td>{{ fee.amount }}</td>
-        <td>{{ fee.status }}</td>
+        <td>{{ fee.feeType }}</td>
+        <td>{{ fee.totalAmount }}</td>
+        <td>{{ fee.paidAmount }}</td>
+        <td>{{ fee.dueAmount }}</td>
+        <td>
+          <!-- Buttons for editing and deleting a fee -->
+          <!-- <button (click)="editFee(fee)">Edit</button>
+          <button (click)="deleteFee(fee.id)">Delete</button> -->
+        </td>
       </tr>
     </tbody>
   </table>
-  
+</div>

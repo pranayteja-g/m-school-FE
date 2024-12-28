@@ -1,8 +1,16 @@
-<div>
+<!-- <div>
   <label for="studentId">Enter Student ID:</label>
   <input type="number" id="studentId" [(ngModel)]="studentId" />
   <button (click)="getAllExamResultsByStudentId()">Get Results</button>
+</div> -->
+
+<div>
+  <h3>Search Exam Results by Student ID</h3>
+  <label for="studentId">Student ID:</label>
+  <!-- Trigger search on input change -->
+  <input [(ngModel)]="studentId" name="studentId" type="number" (input)="getAllExamResultsByStudentId()" />
 </div>
+
 
 <table *ngIf="examResults.length > 0">
   <thead>

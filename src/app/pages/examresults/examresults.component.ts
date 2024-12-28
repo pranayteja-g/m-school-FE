@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './examresults.component.html',
   styleUrl: './examresults.component.css'
 })
-export class ExamresultsComponent implements OnInit{
+export class ExamresultsComponent implements OnInit {
   studentId: number = 0; // Bind this to the input field
   examResultsForStudentId: any[] = [];
   examResults: any[] = [];
@@ -34,8 +34,29 @@ export class ExamresultsComponent implements OnInit{
     });
   }
 
+  // getAllExamResultsByStudentId(): void {
+  //   if (this.studentId > 0) {
+  //     this.examResultService.getAllExamResultsByStudentId(this.studentId, this.currentPage, this.pageSize).subscribe({
+  //       next: (data) => {
+  //         this.examResultsForStudentId = data.content || [];
+  //         this.totalPages = data.totalPages || 0;
+  //       },
+  //       error: (err) => {
+  //         console.error('Error fetching exam results:', err);
+  //       }
+  //     });
+  //   } else {
+  //     console.warn('Please enter a valid Student ID');
+  //   }
+  // }
+
   getAllExamResultsByStudentId(): void {
-    if (this.studentId > 0) {
+    if (!this.studentId) {
+      // If the input is cleared, reset the exam results
+      this.examResultsForStudentId = [];
+      this.totalPages = 0;
+    } else {
+      // Fetch the exam results based on the student ID
       this.examResultService.getAllExamResultsByStudentId(this.studentId, this.currentPage, this.pageSize).subscribe({
         next: (data) => {
           this.examResultsForStudentId = data.content || [];
@@ -45,8 +66,6 @@ export class ExamresultsComponent implements OnInit{
           console.error('Error fetching exam results:', err);
         }
       });
-    } else {
-      console.warn('Please enter a valid Student ID');
     }
   }
 

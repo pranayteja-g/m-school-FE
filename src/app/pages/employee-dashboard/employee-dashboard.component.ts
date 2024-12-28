@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { EmployeeService } from '../../services/employee.service';
 
 @Component({
   selector: 'app-employee-dashboard',
@@ -15,26 +16,30 @@ export class EmployeeDashboardComponent {
   employeeData: any = {
     profile: {},
     classesTaught: [],
-    salaries: []
+    salaries: [],
   };
 
-  constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
+  employeeId!: number;
+
+  constructor(
+    private employeeService: EmployeeService,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    const employeeId = this.authService.getUserId();
+    this.employeeId = this.authService.getUserId();
+    this.loadEmployeeProfile();
+  }
 
-    // Fetch all data in parallel
-    Promise.all([
-      this.http.get(`http://localhost:8080/employee/id/${employeeId}`).toPromise()
-    ])
-    .then(([profileData]: any[]) => {
-      // Assign data to the relevant properties
-      this.employeeData.profile = profileData;
-      this.employeeData.classesTaught = profileData.classesTaught || [];
-      this.employeeData.salaries = profileData.salaries || [];
-    })
-    .catch((error) => {
-      console.error('Error fetching employee data:', error);
+  loadEmployeeProfile(): void {
+    this.employeeService.getEmployeeProfile(this.employeeId).subscribe({
+      next: (data) => {
+        this.employeeData.profile = data;
+        this.employeeData.classesTaught = data.classesTaught || [];
+        this.employeeData.salaries = data.salaries || [];
+      },
+      error: (err) => console.error('Error fetching employee profile:', err),
     });
   }
 }

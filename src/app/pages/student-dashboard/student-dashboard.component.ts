@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from "../navbar/navbar.component";
+import { StudentService } from '../../services/student.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -15,35 +16,39 @@ export class StudentDashboardComponent {
   studentProfile: any = {};
   examResults: any[] = [];
   fees: any[] = [];
-  studentId !: number; // Get student ID from the token or a global service
+  studentId!: number;
 
-  constructor(private http: HttpClient, private router: Router, private authService: AuthService) { }
+  constructor(
+    private studentService: StudentService,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    const studentId = this.authService.getUserId(); // Get the userId from the AuthService
-    this.loadStudentProfile(studentId);
-    this.loadExamResults(studentId);
-    this.loadFees(studentId);
+    this.studentId = this.authService.getUserId();
+    this.loadStudentProfile();
+    this.loadExamResults();
+    this.loadFees();
   }
 
-  loadStudentProfile(studentId: number): void {
-    this.http.get(`http://localhost:8080/student/id/${studentId}`)
-      .subscribe((data: any) => {
-        this.studentProfile = data;
-      });
+  loadStudentProfile(): void {
+    this.studentService.getStudentProfile(this.studentId).subscribe({
+      next: (data) => (this.studentProfile = data),
+      error: (err) => console.error('Error fetching student profile:', err),
+    });
   }
 
-  loadExamResults(studentId: number): void {
-    this.http.get(`http://localhost:8080/student/results/${studentId}`)
-      .subscribe((data: any) => {
-        this.examResults = data;
-      });
+  loadExamResults(): void {
+    this.studentService.getExamResults(this.studentId).subscribe({
+      next: (data) => (this.examResults = data),
+      error: (err) => console.error('Error fetching exam results:', err),
+    });
   }
 
-  loadFees(studentId: number): void {
-    this.http.get(`http://localhost:8080/student/fees/${studentId}`)
-      .subscribe((data: any) => {
-        this.fees = data;
-      });
+  loadFees(): void {
+    this.studentService.getFees(this.studentId).subscribe({
+      next: (data) => (this.fees = data),
+      error: (err) => console.error('Error fetching fees:', err),
+    });
   }
 }
