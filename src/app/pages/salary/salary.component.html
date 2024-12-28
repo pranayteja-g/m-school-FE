@@ -1,34 +1,48 @@
-<div class="salary-container">
-  <h2>Employee Salary Details</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">Employee Salary Details</h2>
 
-  <div>
+  <!-- Search Salary by Employee ID Section -->
+  <div class="card mb-4 p-3">
     <h3>Search Salary by Employee ID</h3>
-    <label for="employeeId">Employee ID:</label>
-    <!-- trigger search on imput change -->
-    <input [(ngModel)]="employeeId" name="employeeId" type="number" (input)="getSalaryByEmployeeId()" />
+    <div class="form-group">
+      <label for="employeeId">Employee ID:</label>
+      <!-- trigger search on input change -->
+      <input [(ngModel)]="employeeId" name="employeeId" type="number" class="form-control" (input)="getSalaryByEmployeeId()" />
+    </div>
   </div>
 
-
-  <div>
+  <!-- Filter Salaries by Date Range Section -->
+  <div class="card mb-4 p-3">
     <h3>Filter Salaries by Date Range</h3>
-    <label for="startDate">Start Date:</label>
-    <input [(ngModel)]="startDate" name="startDate" type="date" />
-    <label for="endDate">End Date:</label>
-    <input [(ngModel)]="endDate" name="endDate" type="date" />
-    <button (click)="filterSalariesByDate()">Filter</button>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="startDate">Start Date:</label>
+        <input [(ngModel)]="startDate" name="startDate" type="date" class="form-control" />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="endDate">End Date:</label>
+        <input [(ngModel)]="endDate" name="endDate" type="date" class="form-control" />
+      </div>
+    </div>
+    <button (click)="filterSalariesByDate()" class="btn btn-primary mt-2">Filter</button>
   </div>
 
-  <div *ngIf="salaries.length > 0">
+  <!-- Display Salary Records -->
+  <div *ngIf="salaries.length > 0" class="card p-3">
     <h3>Salary Records</h3>
-    <ul>
-      <li *ngFor="let salary of salaries">
-        ID: {{ salary.id }}, Employee ID: {{ salary.employeeId }}, Amount: {{ salary.amount }} <br />
-        Date: {{ salary.createdDate | date:'yyyy-MM-dd' }}, Status: {{ salary.status }}
+    <ul class="list-group">
+      <li *ngFor="let salary of salaries" class="list-group-item">
+        <strong>ID:</strong> {{ salary.id }} <br />
+        <strong>Employee ID:</strong> {{ salary.employeeId }} <br />
+        <strong>Amount:</strong> {{ salary.amount | currency }} <br />
+        <strong>Date:</strong> {{ salary.createdDate | date:'yyyy-MM-dd' }} <br />
+        <strong>Status:</strong> {{ salary.status }}
       </li>
     </ul>
   </div>
 
-  <div *ngIf="salaries.length === 0">
-    <p>No salaries found.</p>
+  <!-- No Salary Found Message -->
+  <div *ngIf="salaries.length === 0" class="alert alert-warning mt-4">
+    No salaries found.
   </div>
 </div>

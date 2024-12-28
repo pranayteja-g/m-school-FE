@@ -1,30 +1,32 @@
-<div class="fees-container">
-  <h2>Fees List</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">Fees List</h2>
 
   <!-- Display loading message if fees are not yet fetched -->
-  <div *ngIf="fees.length === 0">No fees found.</div>
+  <div *ngIf="fees.length === 0" class="alert alert-warning">
+    No fees found.
+  </div>
 
   <!-- Table for displaying the list of fees -->
-  <table *ngIf="fees.length > 0" class="fees-table">
-    <thead>
+  <table *ngIf="fees.length > 0" class="table table-bordered table-striped">
+    <thead class="thead-dark">
       <tr>
-        <th>Fee Type</th>
-        <th>Total Amount</th>
-        <th>Paid Amount</th>
-        <th>Due Amount</th>
-        <th>Actions</th>
+        <th scope="col">Fee Type</th>
+        <th scope="col">Total Amount</th>
+        <th scope="col">Paid Amount</th>
+        <th scope="col">Due Amount</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let fee of fees">
         <td>{{ fee.feeType }}</td>
-        <td>{{ fee.totalAmount }}</td>
-        <td>{{ fee.paidAmount }}</td>
-        <td>{{ fee.dueAmount }}</td>
+        <td>{{ fee.totalAmount | currency }}</td>
+        <td>{{ fee.paidAmount | currency }}</td>
+        <td>{{ fee.dueAmount | currency }}</td>
         <td>
           <!-- Buttons for editing and deleting a fee -->
-          <!-- <button (click)="editFee(fee)">Edit</button>
-          <button (click)="deleteFee(fee.id)">Delete</button> -->
+          <!-- <button class="btn btn-primary btn-sm mr-2" (click)="editFee(fee)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteFee(fee.id)">Delete</button> -->
         </td>
       </tr>
     </tbody>

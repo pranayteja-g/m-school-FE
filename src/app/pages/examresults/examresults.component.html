@@ -1,79 +1,110 @@
-<!-- <div>
-  <label for="studentId">Enter Student ID:</label>
-  <input type="number" id="studentId" [(ngModel)]="studentId" />
-  <button (click)="getAllExamResultsByStudentId()">Get Results</button>
-</div> -->
-
-<div>
-  <h3>Search Exam Results by Student ID</h3>
-  <label for="studentId">Student ID:</label>
-  <!-- Trigger search on input change -->
-  <input [(ngModel)]="studentId" name="studentId" type="number" (input)="getAllExamResultsByStudentId()" />
+<!-- Search Section -->
+<div class="container mt-4">
+  <div class="card shadow-sm p-3">
+    <h3 class="card-title mb-3">Search Exam Results by Student ID</h3>
+    <div class="form-group">
+      <label for="studentId" class="form-label">Student ID:</label>
+      <input 
+        [(ngModel)]="studentId" 
+        name="studentId" 
+        type="number" 
+        class="form-control w-25"
+        (input)="getAllExamResultsByStudentId()"
+        placeholder="Enter student ID" />
+    </div>
+  </div>
 </div>
 
+<!-- Filtered Results Table -->
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover" *ngIf="examResults.length > 0">
+        <thead class="table-dark">
+          <tr>
+            <th>Student ID</th>
+            <th>Exam Type</th>
+            <th>Marks Obtained</th>
+            <th>Total Marks</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let result of examResultsForStudentId">
+            <td>{{ studentId }}</td>
+            <td>{{ result.examType }}</td>
+            <td>{{ result.marksObtained }}</td>
+            <td>{{ result.totalMarks }}</td>
+            <td>{{ result.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<table *ngIf="examResults.length > 0">
-  <thead>
-    <tr>
-      <th>Student ID</th>
-      <th>Exam Type</th>
-      <th>Marks Obtained</th>
-      <th>Total Marks</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let result of examResultsForStudentId">
-      <td>{{ studentId }}</td>
-      <td>{{ result.examType }}</td>
-      <td>{{ result.marksObtained }}</td>
-      <td>{{ result.totalMarks }}</td>
-      <td>{{ result.date }}</td>
-    </tr>
-  </tbody>
-</table>
+    <!-- Pagination -->
+    <div class="card-footer" *ngIf="totalPages > 1">
+      <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-primary" (click)="changePage(-1)" [disabled]="currentPage === 0">
+          Previous
+        </button>
+        <button class="btn btn-primary" (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">
+          Next
+        </button>
+      </div>
+    </div>
 
-<div *ngIf="totalPages > 1">
-  <button (click)="changePage(-1)" [disabled]="currentPage === 0">Previous</button>
-  <button (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">Next</button>
+    <!-- No Results Message -->
+    <div class="card-body text-center" *ngIf="examResults.length === 0 && studentId > 0">
+      <p class="text-muted">No exam results found for Student ID: {{ studentId }}</p>
+    </div>
+  </div>
 </div>
 
-<div *ngIf="examResults.length === 0 && studentId > 0">
-  <p>No exam results found for Student ID: {{ studentId }}</p>
-</div>
+<!-- All Results Section -->
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h3 class="mb-0">Exam Results</h3>
+    </div>
 
+    <div class="table-responsive">
+      <table class="table table-striped table-hover" *ngIf="examResults.length > 0">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Student ID</th>
+            <th>Exam Type</th>
+            <th>Marks Obtained</th>
+            <th>Total Marks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let result of examResults">
+            <td>{{ result.id }}</td>
+            <td>{{ result.studentDto.id }}</td>
+            <td>{{ result.examType }}</td>
+            <td>{{ result.marksObtained }}</td>
+            <td>{{ result.totalMarks }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
+    <!-- Pagination -->
+    <div class="card-footer" *ngIf="totalPages > 1">
+      <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-primary" (click)="changePage(-1)" [disabled]="currentPage === 0">
+          Previous
+        </button>
+        <button class="btn btn-primary" (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">
+          Next
+        </button>
+      </div>
+    </div>
 
-<div>
-  <h3>Exam Results</h3>
-</div>
-
-<table *ngIf="examResults.length > 0">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Student ID</th>
-      <th>Exam Type</th>
-      <th>Marks Obtained</th>
-      <th>Total Marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let result of examResults">
-      <td>{{ result.id }}</td>
-      <td>{{ result.studentId }}</td>
-      <td>{{ result.examType }}</td>
-      <td>{{ result.marksObtained }}</td>
-      <td>{{ result.totalMarks }}</td>
-    </tr>
-  </tbody>
-</table>
-
-<div *ngIf="totalPages > 1">
-  <button (click)="changePage(-1)" [disabled]="currentPage === 0">Previous</button>
-  <button (click)="changePage(1)" [disabled]="currentPage === totalPages - 1">Next</button>
-</div>
-
-<div *ngIf="examResults.length === 0">
-  <p>No exam results available.</p>
+    <!-- No Results Message -->
+    <div class="card-body text-center" *ngIf="examResults.length === 0">
+      <p class="text-muted">No exam results available.</p>
+    </div>
+  </div>
 </div>
