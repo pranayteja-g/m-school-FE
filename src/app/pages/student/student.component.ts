@@ -55,25 +55,25 @@ export class StudentComponent {
   }
 
   // method for searching students by name
-searchStudentsByName(): void {
-  if (this.studentName.trim() === '') {
-    this.message = 'Please enter a student name to search.';
-    return;
-  }
-
-  this.studentService.getStudentsByName(this.studentName).subscribe(
-    response => {
-      this.studentsByName = response;
-      this.message = `${response.length} student(s) found.`;
-      console.log(response);
-    },
-    error => {
-      this.studentsByName = [];
-      this.message = 'Error fetching students by name';
-      console.error(error);
+  searchStudentsByName(): void {
+    if (this.studentName.trim() === '') {
+      this.message = 'Please enter a student name to search.';
+      return;
     }
-  );
-}
+
+    this.studentService.getStudentsByName(this.studentName).subscribe(
+      response => {
+        this.studentsByName = response;
+        this.message = `${response.length} student(s) found.`;
+        console.log(response);
+      },
+      error => {
+        this.studentsByName = [];
+        this.message = 'Error fetching students by name';
+        console.error(error);
+      }
+    );
+  }
 
   // Update student
   updateStudent(): void {

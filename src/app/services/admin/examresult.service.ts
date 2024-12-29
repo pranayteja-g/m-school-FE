@@ -45,7 +45,6 @@ export interface ExamResult {
   marksObtained: number;
   totalMarks: number;
 }
-
 export interface Student {
   id: number;
   name: string;

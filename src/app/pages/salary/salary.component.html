@@ -1,13 +1,19 @@
 <div class="container mt-4">
-  <h2 class="mb-4">Employee Salary Details</h2>
+  <h2 class="mb-4 text-center">Employee Salary Details</h2>
 
   <!-- Search Salary by Employee ID Section -->
   <div class="card mb-4 p-3">
     <h3>Search Salary by Employee ID</h3>
     <div class="form-group">
       <label for="employeeId">Employee ID:</label>
-      <!-- trigger search on input change -->
-      <input [(ngModel)]="employeeId" name="employeeId" type="number" class="form-control" (input)="getSalaryByEmployeeId()" />
+      <input 
+        [(ngModel)]="employeeId" 
+        name="employeeId" 
+        type="number" 
+        class="form-control" 
+        placeholder="Enter Employee ID" 
+        (input)="getSalaryByEmployeeId()" 
+      />
     </div>
   </div>
 
@@ -24,7 +30,53 @@
         <input [(ngModel)]="endDate" name="endDate" type="date" class="form-control" />
       </div>
     </div>
-    <button (click)="filterSalariesByDate()" class="btn btn-primary mt-2">Filter</button>
+    <button (click)="filterSalariesByDate()" class="btn btn-primary mt-2">
+      Filter
+    </button>
+  </div>
+
+  <!-- Create Salary Section -->
+  <div class="card mb-4 p-3">
+    <h3>Create Salary</h3>
+    <form #createForm="ngForm" (ngSubmit)="createSalary(createForm)">
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="employeeId">Employee ID:</label>
+          <input 
+            [(ngModel)]="newSalary.employeeId" 
+            name="employeeId" 
+            type="number" 
+            class="form-control" 
+            placeholder="Enter Employee ID" 
+            required 
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label for="amount">Amount:</label>
+          <input 
+            [(ngModel)]="newSalary.salaryAmount" 
+            name="amount" 
+            type="number" 
+            class="form-control" 
+            placeholder="Enter Amount" 
+            required 
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label for="status">Status:</label>
+          <select 
+            [(ngModel)]="newSalary.status" 
+            name="status" 
+            class="form-control" 
+            required
+          >
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success mt-2">Create Salary</button>
+    </form>
   </div>
 
   <!-- Display Salary Records -->
@@ -32,11 +84,29 @@
     <h3>Salary Records</h3>
     <ul class="list-group">
       <li *ngFor="let salary of salaries" class="list-group-item">
-        <strong>ID:</strong> {{ salary.id }} <br />
-        <strong>Employee ID:</strong> {{ salary.employeeId }} <br />
-        <strong>Amount:</strong> {{ salary.amount | currency }} <br />
-        <strong>Date:</strong> {{ salary.createdDate | date:'yyyy-MM-dd' }} <br />
-        <strong>Status:</strong> {{ salary.status }}
+        <div class="row">
+          <div class="col-md-8">
+            <strong>ID:</strong> {{ salary.id }} <br />
+            <strong>Employee ID:</strong> {{ salary.employeeDto?.id}} <br />
+            <strong>Amount:</strong> {{ salary.salaryAmount | currency }} <br />
+            <strong>Date:</strong> {{ salary.createdDate | date: 'yyyy-MM-dd' }} <br />
+            <strong>Status:</strong> {{ salary.status }}
+          </div>
+          <div class="col-md-4 text-right">
+            <button 
+              class="btn btn-primary btn-sm mr-2" 
+              (click)="editSalary(salary)"
+            >
+              Edit
+            </button>
+            <button 
+              class="btn btn-danger btn-sm" 
+              (click)="deleteSalary(salary.id)"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -44,5 +114,48 @@
   <!-- No Salary Found Message -->
   <div *ngIf="salaries.length === 0" class="alert alert-warning mt-4">
     No salaries found.
+  </div>
+
+  <!-- Edit Salary Section -->
+  <div class="card mb-4 p-3" *ngIf="editMode">
+    <h3>Edit Salary</h3>
+    <form #editForm="ngForm" (ngSubmit)="updateSalary(editSalaryData)">
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="employeeIdEdit">Employee ID:</label>
+          <input 
+            [(ngModel)]="editSalaryData.employeeId" 
+            name="employeeId" 
+            type="number" 
+            class="form-control" 
+            required 
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label for="amountEdit">Amount:</label>
+          <input 
+            [(ngModel)]="editSalaryData.salaryAmount" 
+            name="amount" 
+            type="number" 
+            class="form-control" 
+            required 
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label for="statusEdit">Status:</label>
+          <select 
+            [(ngModel)]="editSalaryData.status" 
+            name="status" 
+            class="form-control" 
+            required
+          >
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2">Update Salary</button>
+      <button type="button" class="btn btn-secondary mt-2" (click)="cancelEdit()">Cancel</button>
+    </form>
   </div>
 </div>

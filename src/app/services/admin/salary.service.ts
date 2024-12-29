@@ -37,10 +37,17 @@ export class SalaryService {
 
 }
 
+export interface EmployeeDto {
+  id: number;
+  name: string;
+  subject: string;
+}
+
 export interface Salary {
   id: number;
-  employeeId: number;
-  amount: number;
+  employeeId?: number; // Optional, based on whether you need both
+  salaryAmount: number;
   createdDate: Date;
-  status: string; // Paid/Unpaid
+  status: string;
+  employeeDto?: EmployeeDto; // Optional if not always returned
 }

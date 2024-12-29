@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Salary, SalaryService } from '../../services/admin/salary.service';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -15,6 +15,18 @@ export class SalaryComponent implements OnInit {
   employeeId!: number; // For fetching salary by employee ID
   startDate!: string; // Start date for filtering salary
   endDate!: string; // End date for filtering salary
+
+
+
+  newSalary: Salary = {
+    id: 0,
+    employeeId: 0,
+    salaryAmount: 0,
+    createdDate: new Date(),
+    status: 'Unpaid'
+  };
+  editMode = false;
+  editSalaryData: Salary = { ...this.newSalary };
 
   constructor(private salaryService: SalaryService, private http: HttpClient) { }
   ngOnInit(): void {
@@ -56,6 +68,45 @@ export class SalaryComponent implements OnInit {
         error: (err) => console.error('Error fetching salary by employee ID:', err),
       });
     }
+  }
+
+
+  createSalary(form: NgForm): void {
+    if (form.valid) {
+      this.salaryService.createSalary(this.newSalary).subscribe({
+        next: () => {
+          this.getAllSalaries();
+          form.resetForm();
+        },
+        error: (err) => console.error('Error creating salary:', err),
+      });
+    }
+  }
+
+  editSalary(salary: Salary): void {
+    this.editMode = true;
+    this.editSalaryData = { ...salary };
+  }
+
+  updateSalary(salary: Salary): void {
+    this.salaryService.updateSalary(salary.id, salary).subscribe({
+      next: () => {
+        this.getAllSalaries();
+        this.editMode = false;
+      },
+      error: (err) => console.error('Error updating salary:', err),
+    });
+  }
+
+  deleteSalary(id: number): void {
+    this.salaryService.deleteSalary(id).subscribe({
+      next: () => this.getAllSalaries(),
+      error: (err) => console.error('Error deleting salary:', err),
+    });
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
   }
 
 
