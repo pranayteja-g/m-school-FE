@@ -1,34 +1,26 @@
+<app-navbar></app-navbar>
+
 <div class="container mt-4">
-  <h2 class="mb-4">Fees List</h2>
-
-  <!-- Display loading message if fees are not yet fetched -->
-  <div *ngIf="fees.length === 0" class="alert alert-warning">
-    No fees found.
+  <!-- Form to create new fee -->
+  <div class="card shadow-sm p-3">
+    <h3>Create Fee</h3>
+    <form (ngSubmit)="createFee()">
+      <div class="form-group mb-3">
+        <label for="studentId">Student ID</label>
+        <input [(ngModel)]="newFee.student.id" name="studentId" type="number" class="form-control" required />
+      </div>
+      <div class="form-group mb-3">
+        <label for="feeType">Fee Type</label>
+        <input [(ngModel)]="newFee.feeType" name="feeType" type="text" class="form-control" required />
+      </div>
+      <div class="form-group mb-3">
+        <label for="totalAmount">Total Amount</label>
+        <input [(ngModel)]="newFee.totalAmount" name="totalAmount" type="number" class="form-control" required />
+      </div>
+      <div class="form-group mb-3">
+        <label for="paidAmount">Paid Amount</label>
+        <input [(ngModel)]="newFee.paidAmount" name="paidAmount" type="number" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Create Fee</button>
+    </form>
   </div>
-
-  <!-- Table for displaying the list of fees -->
-  <table *ngIf="fees.length > 0" class="table table-bordered table-striped">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">Fee Type</th>
-        <th scope="col">Total Amount</th>
-        <th scope="col">Paid Amount</th>
-        <th scope="col">Due Amount</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let fee of fees">
-        <td>{{ fee.feeType }}</td>
-        <td>{{ fee.totalAmount | currency }}</td>
-        <td>{{ fee.paidAmount | currency }}</td>
-        <td>{{ fee.dueAmount | currency }}</td>
-        <td>
-          <!-- Buttons for editing and deleting a fee -->
-          <!-- <button class="btn btn-primary btn-sm mr-2" (click)="editFee(fee)">Edit</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteFee(fee.id)">Delete</button> -->
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>

@@ -1,7 +1,14 @@
-<!-- As a heading -->
-<nav class="navbar bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Navbar</span>
+      <a class="navbar-brand">{{ pagename }}</a>
+      
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li *ngFor="let link of navLinks" class="nav-item">
+          <a class="nav-link" [routerLink]="link.path">{{ link.name }}</a>
+        </li>
+      </ul>
+      
+      <button type="button" class="btn btn-warning" (click)="logout()">Logout</button>
     </div>
-    <button type="button" class="btn btn-warning" (click)="logout()">logout</button>
-</nav>
+  </nav>
+  

@@ -9,7 +9,6 @@ import { EmployeeComponent } from './pages/employee/employee.component';
 import { StudentComponent } from './pages/student/student.component';
 import { FeesComponent } from './pages/fees/fees.component';
 import { ExamresultsComponent } from './pages/examresults/examresults.component';
-import { AdminOverviewComponent } from './pages/admin-overview/admin-overview.component';
 import { SalaryComponent } from './pages/salary/salary.component';
 
 export const routes: Routes = [
@@ -20,8 +19,7 @@ export const routes: Routes = [
     { path: "employee", component: EmployeeComponent },
     { path: "student", component: StudentComponent },
     { path: "fees", component: FeesComponent },
-    { path: "examresults", component: ExamresultsComponent },
-    { path: "admin", component: AdminOverviewComponent },
+    { path: "results", component: ExamresultsComponent },
     { path: "salary", component: SalaryComponent },
 
     {

@@ -1,21 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class FeeService {
-
   private baseUrl = 'http://localhost:8080/admin';
 
   constructor(private http: HttpClient) { }
 
-  createFee(fee: Fee) {
-    return this.http.post<Fee[]>(`${this.baseUrl}/f/create`, fee);
+  createFee(fee: Omit<Fee, 'id'>): Observable<Fee> {
+    // Remove the id field when creating a new fee
+    const { id, ...feeWithoutId } = fee as Fee;
+    return this.http.post<Fee>(`${this.baseUrl}/f/create`, feeWithoutId);
   }
 
-  getAllFees() {
+  getAllFees(): Observable<Fee[]> {
     return this.http.get<Fee[]>(`${this.baseUrl}/f/all`);
   }
 
@@ -37,10 +39,11 @@ export class FeeService {
 
 export interface Fee {
   id: number;
-  studentId: number;
   feeType: string;
-  totalAmount: number
-  paidAmount: number
-  dueAmount: number
-
+  totalAmount: number;
+  paidAmount: number;
+  dueAmount: number;
+  student: {
+    id: number;
+  }
 }
