@@ -5,13 +5,12 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class SalaryService {
-
   private baseUrl = 'http://localhost:8080/admin';
 
   constructor(private http: HttpClient) { }
 
-  createSalary(salary: Salary) {
-    return this.http.post<Salary[]>(`${this.baseUrl}/sal/create`, salary);
+  createSalary(salary: CreateSalaryDto) {
+    return this.http.post<Salary>(`${this.baseUrl}/sal/create`, salary);
   }
 
   getAllSalaries() {
@@ -23,31 +22,39 @@ export class SalaryService {
       params: { startDate, endDate },
     });
   }
+
   getSalaryByEmployeeId(employeeId: number) {
     return this.http.get<Salary[]>(`http://localhost:8080/employee/salary/${employeeId}`);
   }
 
-  updateSalary(id: number, salary: Salary) {
-    return this.http.put<Salary[]>(`${this.baseUrl}/sal/update/${id}`, salary);
+  updateSalary(id: number, salary: CreateSalaryDto) {
+    return this.http.put<Salary>(`${this.baseUrl}/sal/update/${id}`, salary);
   }
 
   deleteSalary(salaryId: number) {
-    return this.http.delete<Salary[]>(`${this.baseUrl}/sal/delete/${salaryId}`);
+    return this.http.delete<void>(`${this.baseUrl}/sal/delete/${salaryId}`);
   }
-
 }
-
 export interface EmployeeDto {
   id: number;
-  name: string;
-  subject: string;
+  name?: string;
+  subject?: string;
 }
 
 export interface Salary {
   id: number;
-  employeeId?: number; // Optional, based on whether you need both
   salaryAmount: number;
   createdDate: Date;
-  status: string;
-  employeeDto?: EmployeeDto; // Optional if not always returned
+  employee: {
+    id: number;
+  };
+  employeeDto?: EmployeeDto;
+}
+
+// For creating a new salary, we don't need all fields
+export interface CreateSalaryDto {
+  salaryAmount: number;
+  employee: {
+    id: number;
+  };
 }

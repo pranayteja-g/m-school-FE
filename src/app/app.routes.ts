@@ -16,11 +16,11 @@ export const routes: Routes = [
     { path: "", redirectTo: "/login", pathMatch: "full" },
     { path: "login", component: LoginComponent },
     { path: "forbidden", component: ForbiddenComponent },
-    { path: "employee", component: EmployeeComponent },
-    { path: "student", component: StudentComponent },
-    { path: "fees", component: FeesComponent },
-    { path: "results", component: ExamresultsComponent },
-    { path: "salary", component: SalaryComponent },
+    { path: "m-employee", component: EmployeeComponent },
+    { path: "m-student", component: StudentComponent },
+    { path: "m-fees", component: FeesComponent },
+    { path: "m-results", component: ExamresultsComponent },
+    { path: "m-salary", component: SalaryComponent },
 
     {
         path: "admindashboard",

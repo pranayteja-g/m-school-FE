@@ -1,161 +1,169 @@
-<div class="container mt-4">
-  <h2 class="mb-4 text-center">Employee Salary Details</h2>
+<app-navbar></app-navbar>
 
-  <!-- Search Salary by Employee ID Section -->
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Employee Salary Management</h2>
+
+  <!-- Search Section -->
   <div class="card mb-4 p-3">
-    <h3>Search Salary by Employee ID</h3>
+    <h3>Search Salary</h3>
     <div class="form-group">
-      <label for="employeeId">Employee ID:</label>
-      <input 
-        [(ngModel)]="employeeId" 
-        name="employeeId" 
-        type="number" 
-        class="form-control" 
-        placeholder="Enter Employee ID" 
-        (input)="getSalaryByEmployeeId()" 
-      />
+      <label for="searchEmployeeId">Employee ID:</label>
+      <div class="d-flex">
+        <input 
+          [(ngModel)]="searchEmployeeId" 
+          name="searchEmployeeId" 
+          type="number" 
+          class="form-control" 
+          placeholder="Enter Employee ID"
+        />
+        <button (click)="searchByEmployeeId()" class="btn btn-primary ml-2">Search</button>
+      </div>
     </div>
   </div>
 
-  <!-- Filter Salaries by Date Range Section -->
+  <!-- Date Filter Section -->
   <div class="card mb-4 p-3">
-    <h3>Filter Salaries by Date Range</h3>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="startDate">Start Date:</label>
-        <input [(ngModel)]="startDate" name="startDate" type="date" class="form-control" />
+    <h3>Filter by Date</h3>
+    <div class="row">
+      <div class="col-md-5">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input 
+            [(ngModel)]="startDate" 
+            type="date" 
+            class="form-control" 
+            name="startDate"
+          />
+        </div>
       </div>
-      <div class="form-group col-md-6">
-        <label for="endDate">End Date:</label>
-        <input [(ngModel)]="endDate" name="endDate" type="date" class="form-control" />
+      <div class="col-md-5">
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input 
+            [(ngModel)]="endDate" 
+            type="date" 
+            class="form-control" 
+            name="endDate"
+          />
+        </div>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button (click)="filterSalariesByDate()" class="btn btn-primary">Filter</button>
       </div>
     </div>
-    <button (click)="filterSalariesByDate()" class="btn btn-primary mt-2">
-      Filter
-    </button>
   </div>
 
   <!-- Create Salary Section -->
   <div class="card mb-4 p-3">
-    <h3>Create Salary</h3>
+    <h3>Create New Salary</h3>
     <form #createForm="ngForm" (ngSubmit)="createSalary(createForm)">
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="employeeId">Employee ID:</label>
-          <input 
-            [(ngModel)]="newSalary.employeeId" 
-            name="employeeId" 
-            type="number" 
-            class="form-control" 
-            placeholder="Enter Employee ID" 
-            required 
-          />
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="employeeId">Employee ID:</label>
+            <input 
+              [(ngModel)]="newSalary.employee.id" 
+              name="employeeId" 
+              type="number" 
+              class="form-control" 
+              required
+            />
+          </div>
         </div>
-        <div class="form-group col-md-4">
-          <label for="amount">Amount:</label>
-          <input 
-            [(ngModel)]="newSalary.salaryAmount" 
-            name="amount" 
-            type="number" 
-            class="form-control" 
-            placeholder="Enter Amount" 
-            required 
-          />
-        </div>
-        <div class="form-group col-md-4">
-          <label for="status">Status:</label>
-          <select 
-            [(ngModel)]="newSalary.status" 
-            name="status" 
-            class="form-control" 
-            required
-          >
-            <option value="Paid">Paid</option>
-            <option value="Unpaid">Unpaid</option>
-          </select>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="amount">Salary Amount:</label>
+            <input 
+              [(ngModel)]="newSalary.salaryAmount" 
+              name="amount" 
+              type="number" 
+              class="form-control" 
+              required
+            />
+          </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-success mt-2">Create Salary</button>
+      <button type="submit" class="btn btn-success mt-3" [disabled]="!createForm.valid">
+        Create Salary
+      </button>
     </form>
   </div>
 
-  <!-- Display Salary Records -->
-  <div *ngIf="salaries.length > 0" class="card p-3">
+  <!-- Salary List -->
+  <div class="card p-3">
     <h3>Salary Records</h3>
-    <ul class="list-group">
-      <li *ngFor="let salary of salaries" class="list-group-item">
-        <div class="row">
-          <div class="col-md-8">
-            <strong>ID:</strong> {{ salary.id }} <br />
-            <strong>Employee ID:</strong> {{ salary.employeeDto?.id}} <br />
-            <strong>Amount:</strong> {{ salary.salaryAmount | currency }} <br />
-            <strong>Date:</strong> {{ salary.createdDate | date: 'yyyy-MM-dd' }} <br />
-            <strong>Status:</strong> {{ salary.status }}
-          </div>
-          <div class="col-md-4 text-right">
-            <button 
-              class="btn btn-primary btn-sm mr-2" 
-              (click)="editSalary(salary)"
-            >
-              Edit
-            </button>
-            <button 
-              class="btn btn-danger btn-sm" 
-              (click)="deleteSalary(salary.id)"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </li>
-    </ul>
+    <div *ngIf="salaries.length > 0; else noSalaries" class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee ID</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let salary of salaries">
+            <td>{{salary.id}}</td>
+            <td>{{salary.employeeDto?.id}}</td>
+            <td>{{salary.salaryAmount | currency}}</td>
+            <td>{{salary.createdDate | date:'mediumDate'}}</td>
+            <td>
+              <button class="btn btn-sm btn-primary mr-2" (click)="editSalary(salary)">Edit</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteSalary(salary.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noSalaries>
+      <div class="alert alert-info">No salary records found.</div>
+    </ng-template>
   </div>
 
-  <!-- No Salary Found Message -->
-  <div *ngIf="salaries.length === 0" class="alert alert-warning mt-4">
-    No salaries found.
-  </div>
-
-  <!-- Edit Salary Section -->
-  <div class="card mb-4 p-3" *ngIf="editMode">
-    <h3>Edit Salary</h3>
-    <form #editForm="ngForm" (ngSubmit)="updateSalary(editSalaryData)">
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="employeeIdEdit">Employee ID:</label>
-          <input 
-            [(ngModel)]="editSalaryData.employeeId" 
-            name="employeeId" 
-            type="number" 
-            class="form-control" 
-            required 
-          />
+  <!-- Edit Modal -->
+  <div *ngIf="editMode" class="modal show d-block" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Salary</h5>
+          <button type="button" class="close" (click)="cancelEdit()">
+            <span>&times;</span>
+          </button>
         </div>
-        <div class="form-group col-md-4">
-          <label for="amountEdit">Amount:</label>
-          <input 
-            [(ngModel)]="editSalaryData.salaryAmount" 
-            name="amount" 
-            type="number" 
-            class="form-control" 
-            required 
-          />
+        <div class="modal-body">
+          <form #editForm="ngForm">
+            <div class="form-group">
+              <label>Salary ID:</label>
+              <input 
+                [(ngModel)]="editSalaryData.employee.id" 
+                name="editEmployeeId" 
+                type="number" 
+                class="form-control" 
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Salary Amount:</label>
+              <input 
+                [(ngModel)]="editSalaryData.salaryAmount" 
+                name="editAmount" 
+                type="number" 
+                class="form-control" 
+                required
+              />
+            </div>
+          </form>
         </div>
-        <div class="form-group col-md-4">
-          <label for="statusEdit">Status:</label>
-          <select 
-            [(ngModel)]="editSalaryData.status" 
-            name="status" 
-            class="form-control" 
-            required
-          >
-            <option value="Paid">Paid</option>
-            <option value="Unpaid">Unpaid</option>
-          </select>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="updateSalary()" [disabled]="!editForm.valid">
+            Save Changes
+          </button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary mt-2">Update Salary</button>
-      <button type="button" class="btn btn-secondary mt-2" (click)="cancelEdit()">Cancel</button>
-    </form>
+    </div>
   </div>
+  <div *ngIf="editMode" class="modal-backdrop show"></div>
 </div>

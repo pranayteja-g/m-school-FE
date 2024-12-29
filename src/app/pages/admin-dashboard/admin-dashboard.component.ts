@@ -10,7 +10,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [RouterLink, RouterOutlet, NavbarComponent, ExamresultsComponent, FeesComponent, SalaryComponent, StudentComponent, EmployeeComponent],
+  imports: [RouterLink, NavbarComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })

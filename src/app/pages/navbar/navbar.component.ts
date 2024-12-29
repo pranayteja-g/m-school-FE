@@ -62,10 +62,11 @@ export class NavbarComponent implements OnInit {
       ];
     } else if (route.includes('employeedashboard')) {
       return [
+        { name: 'Home', path: '/employeedashboard' },
         { name: 'Salary', path: '/salary' },
         { name: 'Student', path: '/student' },
       ];
-    } else if (route.includes('fees')) {
+    } else if (route.includes('m-fees') || route.includes('m-salary') || route.includes('m-employee')) {
       return [
         { name: 'home', path: '/admindashboard' }
       ];

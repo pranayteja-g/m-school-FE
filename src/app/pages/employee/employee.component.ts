@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { NavbarComponent } from "../navbar/navbar.component";
 
 @Component({
   selector: 'app-employee',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './employee.component.html',
   styleUrl: './employee.component.css'
 })
