@@ -1,144 +1,116 @@
-<app-navbar></app-navbar>
-<!-- Create Employee Form -->
-<div class="form-group">
-  <h3>Create Employee</h3>
-  <form (ngSubmit)="createEmployee()" #createEmployeeForm="ngForm">
-    <div class="form-group">
-      <label for="employeeName">Employee Name</label>
-      <input type="text" class="form-control" id="employeeName" [(ngModel)]="employeeName" name="employeeName" required
-        #employeeNameInput="ngModel" />
-      <div *ngIf="employeeNameInput.invalid && employeeNameInput.touched" class="text-danger">Employee name is required.
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>employee manager</title>
+</head>
+
+<body>
+  <app-navbar></app-navbar>
+
+  <h3 class="text-center mt-5">Employees</h3>
+
+  <!-- button to open create employee modal -->
+  <div class="container mt-2">
+    <button class="btn btn-primary mb-4" (click)="openModal('employeeModal', 'create')">Add Employee</button>
+  </div>
+
+  <!-- modal for employee creation and update -->
+  <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="employeeModalLabel">Create or Update Employee</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- form for create or update employee -->
+          <form (ngSubmit)="action === 'create' ? createEmployee() : updateEmployee()">
+            <div class="mb-3">
+              <label for="employeeName" class="form-label">Name</label>
+              <input type="text" id="employeeName" class="form-control" [(ngModel)]="employeeName" name="name"
+                required />
+            </div>
+            <div class="mb-3">
+              <label for="employeeSubject" class="form-label">Subject</label>
+              <input type="text" id="employeeSubject" class="form-control" [(ngModel)]="subject" name="subject" />
+            </div>
+            <div class="mb-3">
+              <label for="employeeClassesTaught" class="form-label">Classes Taught</label>
+              <input type="text" id="employeeClassesTaught" class="form-control" [(ngModel)]="classesTaughtString"
+                name="classesTaught" />
+            </div>
+            <div class="mb-3">
+              <label for="employeeUsername" class="form-label">Username</label>
+              <input type="text" id="employeeUsername" class="form-control" [(ngModel)]="employeeUsername"
+                name="username" required />
+            </div>
+            <div class="mb-3">
+              <label for="employeePassword" class="form-label">Password</label>
+              <input type="text" id="employeePassword" class="form-control" [(ngModel)]="employeePassword"
+                name="password" required />
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">{{ action === 'create' ? 'Save' : 'Update' }}</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-    <div class="form-group">
-      <label for="employeeUsername">Username</label>
-      <input type="text" class="form-control" id="employeeUsername" [(ngModel)]="employeeUsername"
-        name="employeeUsername" required #employeeUsernameInput="ngModel" />
-      <div *ngIf="employeeUsernameInput.invalid && employeeUsernameInput.touched" class="text-danger">Username is
-        required.</div>
-    </div>
-    <div class="form-group">
-      <label for="employeePassword">Password</label>
-      <input type="password" class="form-control" id="employeePassword" [(ngModel)]="employeePassword"
-        name="employeePassword" required #employeePasswordInput="ngModel" />
-      <div *ngIf="employeePasswordInput.invalid && employeePasswordInput.touched" class="text-danger">Password is
-        required.</div>
-    </div>
-    <div class="form-group">
-      <label for="employeeRole">Role</label>
-      <div class="form-check">
-        <input type="radio" class="form-check-input" id="roleAdmin" name="employeeRole" [(ngModel)]="employeeRole"
-          value="ADMIN" required #employeeRoleInput="ngModel" />
-        <label class="form-check-label" for="roleAdmin">Admin</label>
-      </div>
+  </div>
 
-      <div class="form-check">
-        <input type="radio" class="form-check-input" id="roleEmployee" name="employeeRole" [(ngModel)]="employeeRole"
-          value="EMPLOYEE" required />
-        <label class="form-check-label" for="roleUser">employee</label>
-      </div>
-
-      <div class="form-check">
-        <input type="radio" class="form-check-input" id="roleStudent" name="employeeRole" [(ngModel)]="employeeRole"
-          value="STUDENT" required />
-        <label class="form-check-label" for="roleStudent">Student</label>
-      </div>
-
-      <!-- Display error if no role is selected -->
-      <div *ngIf="employeeRoleInput.invalid && employeeRoleInput.touched" class="text-danger">
-        Role is required.
-      </div>
+  <div class="container mt-2">
+    <!-- search bar -->
+    <div class="mb-3">
+      <input type="text" class="form-control" placeholder="search by name or id" [(ngModel)]="searchQuery" />
     </div>
 
-    <div class="form-group">
-      <label for="subject">Subject</label>
-      <input type="text" class="form-control" id="subject" [(ngModel)]="subject" name="subject" required
-        #subjectInput="ngModel" />
-      <div *ngIf="subjectInput.invalid && subjectInput.touched" class="text-danger">Subject is required.</div>
+
+    <div class="text-center" *ngIf="isLoading">
+      <output class="spinner-border">
+        <span class="sr-only">Loading...</span>
+      </output>
     </div>
-    <div class="form-group">
-      <label for="classesTaught">Classes Taught</label>
-      <input type="text" class="form-control" id="classesTaught" [(ngModel)]="classesTaughtString" name="classesTaught"
-        placeholder="Enter classes separated by commas" />
-      <div *ngIf="classesTaughtString && classesTaughtString.length > 0">
-        Classes will be split into an array when submitted.
+
+
+    <div *ngIf="!isLoading">
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>subject</th>
+            <th>Classes taught</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of filteredEmployees()">
+            <td>{{ employee.id }}</td>
+            <td>{{ employee.name }}</td>
+            <td>{{ employee.subject }}</td>
+            <td>
+              <span *ngFor="let class of employee.classesTaught; let last = last">
+                {{class}} <span *ngIf="!last">, </span>
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-secondary"
+                (click)="openModal('employeeModal', 'update', employee.id)">update</button>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="deleteEmployee(employee.id)">delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- message if no employees are found -->
+      <div *ngIf="!isLoading && allEmployees.length === 0" class="alert alert-info">
+        <p class="text-center">No employees found</p>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary" [disabled]="createEmployeeForm.invalid">Create Employee</button>
-  </form>
-</div>
+  </div>
+</body>
 
-<!-- Update Employee Form -->
-<div class="form-group">
-  <h3>Update Employee</h3>
-  <form (ngSubmit)="updateEmployee()" #updateEmployeeForm="ngForm">
-    <div class="form-group">
-      <label for="employeeId">Employee ID</label>
-      <input type="number" class="form-control" id="employeeId" [(ngModel)]="employeeId" name="employeeId" required
-        #employeeIdInput="ngModel" />
-      <div *ngIf="employeeIdInput.invalid && employeeIdInput.touched" class="text-danger">Employee ID is required.</div>
-    </div>
-    <div class="form-group">
-      <label for="employeeName">Employee Name</label>
-      <input type="text" class="form-control" id="employeeName" [(ngModel)]="employeeName" name="employeeName" required
-        #employeeNameInput="ngModel" />
-      <div *ngIf="employeeNameInput.invalid && employeeNameInput.touched" class="text-danger">Employee name is required.
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="employeeUsername">Username</label>
-      <input type="text" class="form-control" id="employeeUsername" [(ngModel)]="employeeUsername"
-        name="employeeUsername" required #employeeUsernameInput="ngModel" />
-      <div *ngIf="employeeUsernameInput.invalid && employeeUsernameInput.touched" class="text-danger">Username is
-        required.</div>
-    </div>
-    <div class="form-group">
-      <label for="employeePassword">Password</label>
-      <input type="password" class="form-control" id="employeePassword" [(ngModel)]="employeePassword"
-        name="employeePassword" required #employeePasswordInput="ngModel" />
-      <div *ngIf="employeePasswordInput.invalid && employeePasswordInput.touched" class="text-danger">Password is
-        required.</div>
-    </div>
-    <div class="form-group">
-      <label for="employeeRole">Role</label>
-      <input type="text" class="form-control" id="employeeRole" [(ngModel)]="employeeRole" name="employeeRole" required
-        #employeeRoleInput="ngModel" />
-      <div *ngIf="employeeRoleInput.invalid && employeeRoleInput.touched" class="text-danger">Role is required.</div>
-    </div>
-    <div class="form-group">
-      <label for="subject">Subject</label>
-      <input type="text" class="form-control" id="subject" [(ngModel)]="subject" name="subject" required
-        #subjectInput="ngModel" />
-      <div *ngIf="subjectInput.invalid && subjectInput.touched" class="text-danger">Subject is required.</div>
-    </div>
-    <div class="form-group">
-      <label for="classesTaught">Classes Taught</label>
-      <input type="text" class="form-control" id="classesTaught" [(ngModel)]="classesTaughtString" name="classesTaught"
-        placeholder="Enter classes separated by commas" />
-      <div *ngIf="classesTaughtString && classesTaughtString.length > 0">
-        Classes will be split into an array when submitted.
-      </div>
-    </div>
-    <button type="submit" class="btn btn-info" [disabled]="updateEmployeeForm.invalid">Update Employee</button>
-  </form>
-</div>
-
-<!-- Display Message -->
-<div *ngIf="message">
-  <p>{{ message }}</p>
-</div>
-
-<!-- Delete Employee -->
-<div class="form-group">
-  <button class="btn btn-danger" (click)="deleteEmployee()">Delete Employee</button>
-</div>
-
-<!-- List all Employees -->
-<div *ngIf="allEmployees.length > 0">
-  <h3>All Employees:</h3>
-  <ul>
-    <li *ngFor="let employee of allEmployees">
-      {{ employee.name }} ({{ employee.username }}) - {{ employee.role }}
-    </li>
-  </ul>
-</div>
+</html>

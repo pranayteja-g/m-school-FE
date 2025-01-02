@@ -42,6 +42,8 @@ export class NavbarComponent implements OnInit {
       return 'Admin Dashboard';
     } else if (route.includes('employeedashboard')) {
       return 'Employee Dashboard';
+    } else if(route.includes('m-employee')) {
+      return 'Manage Employee';
     }
     return 'Unknown Page'; // Default if no match
   }

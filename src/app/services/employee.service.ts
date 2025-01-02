@@ -46,3 +46,17 @@ export class EmployeeService {
     return this.http.get<any>(`${this.crudUrl}/username/${username}`);
   }
 }
+
+export interface Employee {
+  id: number;
+  name: string;
+  subject: string;
+  classesTaught: string[];
+  user: User;
+}
+
+export interface User {
+  username: string;
+  password: string;
+  role: string;
+}
