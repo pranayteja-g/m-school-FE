@@ -64,7 +64,8 @@
   <div class="container mt-2">
     <!-- search bar -->
     <div class="mb-3">
-      <input type="text" class="form-control" placeholder="search by name or id" [(ngModel)]="searchQuery" />
+      <input type="text" class="form-control" placeholder="Search by name or id" [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchQueryChange()">
     </div>
 
 
@@ -86,7 +87,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let employee of filteredEmployees()">
+          <tr *ngFor="let employee of paginatedEmployees">
             <td>{{ employee.id }}</td>
             <td>{{ employee.name }}</td>
             <td>{{ employee.subject }}</td>
@@ -106,9 +107,21 @@
         </tbody>
       </table>
       <!-- message if no employees are found -->
-      <div *ngIf="!isLoading && allEmployees.length === 0" class="alert alert-info">
+      <div *ngIf="!isLoading && filteredList.length === 0" class="alert alert-info">
         <p class="text-center">No employees found</p>
       </div>
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+      <button class="btn btn-secondary me-2" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
+        Previous
+      </button>
+      <span class="mx-2 pt-2">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </span>
+      <button class="btn btn-secondary ms-2" (click)="goToNextPage()"
+        [disabled]="(currentPage + 1) * itemsPerPage >= filteredList.length">
+        Next
+      </button>
     </div>
   </div>
 </body>

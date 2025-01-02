@@ -30,9 +30,16 @@ export class EmployeeComponent implements OnInit {
   isLoading: boolean = true;
   action: 'create' | 'update' = 'create';
 
+  employees: Employee[] = [];  // Store all employees
+  filteredList: Employee[] = [];   // Filtered employees
+  paginatedEmployees: Employee[] = []; // Current page employees
+  currentPage: number = 0;
+  itemsPerPage: number = 5;
+
   constructor(private employeeService: EmployeeService, private router: Router) { }
   ngOnInit(): void {
     this.fetchAllEmployees();
+    this.updatePagination();
   }
 
   // Open modal for create or update
@@ -161,9 +168,11 @@ export class EmployeeComponent implements OnInit {
 
   // Fetch all employees
   fetchAllEmployees(): void {
+    this.isLoading = true;
     this.employeeService.getAllEmployees().subscribe(
       response => {
-        this.allEmployees = response;
+        this.employees = response;
+        this.filterEmployees(); // This will also update pagination
         this.isLoading = false;
       },
       error => {
@@ -172,6 +181,42 @@ export class EmployeeComponent implements OnInit {
         console.error(error);
       }
     );
+  }
+
+  // Update pagination method
+  updatePagination(): void {
+    const startIndex = this.currentPage * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedEmployees = this.filteredList.slice(startIndex, endIndex);
+  }
+
+
+  goToNextPage(): void {
+    if ((this.currentPage + 1) * this.itemsPerPage < this.filteredList.length) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredList.length / this.itemsPerPage);
+  }
+
+  // Add search query handler
+  onSearchQueryChange(): void {
+    this.filterEmployees();
   }
 
   resetForm(): void {
@@ -184,12 +229,28 @@ export class EmployeeComponent implements OnInit {
   }
 
 
-  filteredEmployees(): Employee[] {
-    const query = this.searchQuery.toLowerCase();
-    return this.allEmployees.filter(
-      (employee) =>
-        employee.id.toString().includes(query) ||
-        employee.name.toLowerCase().includes(query)
-    );
+  // filteredEmployees(): Employee[] {
+  //   const query = this.searchQuery.toLowerCase();
+  //   return this.employees.filter(
+  //     (employee) =>
+  //       employee.id.toString().includes(query) ||
+  //       employee.name.toLowerCase().includes(query)
+  //   );
+  // }
+
+  // filter method
+  private filterEmployees(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.filteredList = [...this.employees];
+    } else {
+      this.filteredList = this.employees.filter(
+        (employee) =>
+          employee.id.toString().includes(query) ||
+          employee.name.toLowerCase().includes(query)
+      );
+    }
+    this.currentPage = 0; // Reset to first page when filtering
+    this.updatePagination();
   }
 }
