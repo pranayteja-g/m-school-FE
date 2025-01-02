@@ -17,6 +17,10 @@ export class StudentService {
     return this.http.get(`${this.baseUrl}/id/${studentId}`);
   }
 
+  getAllStudents(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.curdUrl}/all`);
+  }
+
   getExamResults(studentId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/results/${studentId}`);
   }
@@ -42,3 +46,17 @@ export class StudentService {
   }
 }
 
+export interface Student{
+  id: number;
+  name: string;
+  studentClass: string;
+  section: string;
+  rollNo: string;
+  user: User;
+}
+
+export interface User {
+  username: string;
+  password: string;
+  role: string;
+}

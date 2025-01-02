@@ -1,26 +1,121 @@
-<app-navbar></app-navbar>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-4">
-  <!-- Form to create new fee -->
-  <div class="card shadow-sm p-3">
-    <h3>Create Fee</h3>
-    <form (ngSubmit)="createFee()">
-      <div class="form-group mb-3">
-        <label for="studentId">Student ID</label>
-        <input [(ngModel)]="newFee.student.id" name="studentId" type="number" class="form-control" required />
-      </div>
-      <div class="form-group mb-3">
-        <label for="feeType">Fee Type</label>
-        <input [(ngModel)]="newFee.feeType" name="feeType" type="text" class="form-control" required />
-      </div>
-      <div class="form-group mb-3">
-        <label for="totalAmount">Total Amount</label>
-        <input [(ngModel)]="newFee.totalAmount" name="totalAmount" type="number" class="form-control" required />
-      </div>
-      <div class="form-group mb-3">
-        <label for="paidAmount">Paid Amount</label>
-        <input [(ngModel)]="newFee.paidAmount" name="paidAmount" type="number" class="form-control" required />
-      </div>
-      <button type="submit" class="btn btn-primary">Create Fee</button>
-    </form>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fee Manager</title>
+</head>
+
+<body>
+  <app-navbar></app-navbar>
+
+  <h3 class="text-center mt-5">Fees</h3>
+
+  <!-- Button to open create fee modal -->
+  <div class="container mt-2">
+    <button class="btn btn-primary mb-4" (click)="openModal('feeModal', 'create')">Add Fee</button>
   </div>
+
+  <!-- Modal for fee creation and update -->
+  <div class="modal fade" id="feeModal" tabindex="-1" aria-labelledby="feeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="feeModalLabel">Create or Update Fee</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Form for create or update fee -->
+          <form (ngSubmit)="action === 'create' ? createFee() : updateFee()">
+            <div class="mb-3">
+              <label for="studentId" class="form-label">Student ID</label>
+              <input type="text" id="studentId" class="form-control" [(ngModel)]="feeRequest.student.id"
+                name="studentId" required />
+            </div>
+            <div class="mb-3">
+              <label for="feeType" class="form-label">Fee Type</label>
+              <input type="text" id="feeType" class="form-control" [(ngModel)]="feeRequest.feeType" name="feeType"
+                required />
+            </div>
+
+            <div class="mb-3">
+              <label for="paidAmount" class="form-label">paid Amount</label>
+              <input type="number" id="paidAmount" class="form-control" [(ngModel)]="feeRequest.paidAmount"
+                name="paidAmount" required />
+            </div>
+            <div class="mb-3">
+              <label for="totalAmount" class="form-label">total Amount</label>
+              <input type="number" id="totalAmount" class="form-control" [(ngModel)]="feeRequest.totalAmount"
+                name="totalAmount" required />
+            </div>
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">{{ action === 'create' ? 'Save' : 'Update' }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-2">
+    <!-- Search bar -->
+    <div class="mb-3">
+      <input type="text" class="form-control" placeholder="Search by student name or ID" [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchQueryChange()">
+    </div>
+
+    <!-- Loading spinner -->
+    <div class="text-center" *ngIf="isLoading">
+      <output class="spinner-border">
+        <span class="sr-only">Loading...</span>
+      </output>
+    </div>
+
+    <!-- Fee list -->
+    <div *ngIf="!isLoading">
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>ID</th>
+            <th>Student Id</th>
+            <th>Fee Type</th>
+            <th>Paid Amount</th>
+            <th>Total Amount</th>
+            <th>Due Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fee of paginatedFees">
+            <td>{{ fee?.id }}</td>
+            <td>{{ fee?.studentDto?.id || 'N/A' }}</td>
+            <td>{{ fee.feeType || 'N/A' }}</td>
+            <td>{{ fee.paidAmount | currency }}</td>
+            <td>{{ fee.totalAmount | currency }}</td>
+            <td>{{ fee.totalAmount - fee.paidAmount | currency}}</td>
+            <td>
+              <button class="btn btn-secondary" (click)="openModal('feeModal', 'update', fee.id)">Update</button>
+              <button class="btn btn-danger" (click)="deleteFee(fee.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Message if no fees are found -->
+      <div *ngIf="!isLoading && filteredFees.length === 0" class="alert alert-info">
+        <p class="text-center">No fees found</p>
+      </div>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="d-flex justify-content-center mt-3">
+      <button class="btn btn-secondary me-2" (click)="goToPreviousPage()"
+        [disabled]="currentPage === 0">Previous</button>
+      <span class="mx-2 pt-2">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button class="btn btn-secondary ms-2" (click)="goToNextPage()"
+        [disabled]="(currentPage + 1) * itemsPerPage >= filteredFees.length">Next</button>
+    </div>
+  </div>
+</body>
+
+</html>

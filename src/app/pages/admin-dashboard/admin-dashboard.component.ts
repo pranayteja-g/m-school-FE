@@ -1,12 +1,7 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from "../navbar/navbar.component";
-import { ExamresultsComponent } from "../examresults/examresults.component";
-import { FeesComponent } from "../fees/fees.component";
-import { SalaryComponent } from "../salary/salary.component";
-import { StudentComponent } from "../student/student.component";
-import { EmployeeComponent } from "../employee/employee.component";
-import { Fee } from '../../services/admin/fee.service';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { FeeResponse } from '../../services/admin/fee.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -16,7 +11,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 })
 export class AdminDashboardComponent {
   allExamResults: any[];
-  fees: Fee[] = [];
+  fees: FeeResponse[] = [];
   constructor() {
     this.allExamResults = [];
   }

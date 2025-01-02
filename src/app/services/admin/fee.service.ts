@@ -11,39 +11,49 @@ export class FeeService {
 
   constructor(private http: HttpClient) { }
 
-  createFee(fee: Omit<Fee, 'id'>): Observable<Fee> {
-    // Remove the id field when creating a new fee
-    const { id, ...feeWithoutId } = fee as Fee;
-    return this.http.post<Fee>(`${this.baseUrl}/f/create`, feeWithoutId);
+  createFee(fee: Omit<FeeRequest, 'id'>): Observable<FeeResponse> {
+    return this.http.post<FeeResponse>(`${this.baseUrl}/f/create`, fee);
   }
 
-  getAllFees(): Observable<Fee[]> {
-    return this.http.get<Fee[]>(`${this.baseUrl}/f/all`);
+  getAllFees(): Observable<FeeResponse[]> {
+    return this.http.get<FeeResponse[]>(`${this.baseUrl}/f/all`);
   }
 
   getStudentFees(studentId: number) {
-    return this.http.get<Fee[]>(`http://localhost:8080/student/fees/${studentId}`);
+    return this.http.get<FeeResponse[]>(`http://localhost:8080/student/fees/${studentId}`);
   }
 
-  updateFee(fee: Fee) {
-    return this.http.put<Fee[]>(`${this.baseUrl}/f/update/${fee.id}`, fee);
+  updateFee(fee: FeeRequest): Observable<FeeResponse[]> {
+    return this.http.put<FeeResponse[]>(`${this.baseUrl}/f/update/${fee.id}`, fee);
   }
 
   deleteFee(feeId: number) {
-    return this.http.delete<Fee[]>(`${this.baseUrl}/f/delete/${feeId}`);
+    return this.http.delete<FeeResponse[]>(`${this.baseUrl}/f/delete/${feeId}`);
   }
 
 
 
 }
 
-export interface Fee {
+export interface FeeResponse {
   id: number;
+  studentDto: {
+    id: number;
+    name: string;
+  };
   feeType: string;
-  totalAmount: number;
   paidAmount: number;
+  totalAmount: number;
   dueAmount: number;
+}
+
+export interface FeeRequest {
+  id?: number;
   student: {
     id: number;
-  }
+  };
+  feeType: string;
+  paidAmount: number;
+  totalAmount: number;
+  dueAmount: number;
 }
