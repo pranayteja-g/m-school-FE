@@ -1,4 +1,3 @@
-// student-dashboard.component.html
 <app-navbar></app-navbar>
 <div class="dashboard-container">
     <div *ngIf="loading" class="loading">Loading...</div>
@@ -18,6 +17,34 @@
     <!-- Exam Results Section -->
     <div class="exam-results-section" *ngIf="examResults.length > 0">
         <h3>Exam Results</h3>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="examType">Exam Type:</label>
+                    <select id="examType" [(ngModel)]="selectedExamType" (change)="applyFilters()">
+                        <option value="">All</option>
+                        <option *ngFor="let type of examTypes" [value]="type">
+                            {{type}}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="subject">Subject:</label>
+                    <select id="subject" [(ngModel)]="selectedSubject" (change)="applyFilters()">
+                        <option value="">All</option>
+                        <option *ngFor="let subject of subjects" [value]="subject">
+                            {{subject}}
+                        </option>
+                    </select>
+                </div>
+
+                <button class="reset-button" (click)="resetFilters()">Reset Filters</button>
+            </div>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -29,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let result of examResults">
+                <tr *ngFor="let result of filteredResults">
                     <td>{{ result.subject }}</td>
                     <td>{{ result.examType }}</td>
                     <td>{{ result.marksObtained }}</td>
@@ -39,34 +66,36 @@
             </tbody>
         </table>
 
+        <div *ngIf="filteredResults.length === 0" class="no-results">
+            No results found for the selected filters.
+        </div>
         <!-- Pagination -->
         <div class="pagination" *ngIf="totalPages > 1">
             <button [disabled]="currentPage === 0" (click)="changePage(-1)">Previous</button>
             <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
             <button [disabled]="currentPage === totalPages - 1" (click)="changePage(1)">Next</button>
         </div>
-    </div>
 
-    <!-- Fees Section -->
-    <div class="fees-section" *ngIf="fees.length > 0">
-        <h3>Fees</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fee Type</th>
-                    <th>Due Amount</th>
-                    <th>Paid Amount</th>
-                    <th>Total Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let fee of fees">
-                    <td>{{ fee.feeType }}</td>
-                    <td>{{ fee.totalAmount - fee.paidAmount | currency:'INR' }}</td>
-                    <td>{{ fee.paidAmount | currency:'INR' }}</td>
-                    <td>{{ fee.totalAmount | currency:'INR'}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Fees Section -->
+        <div class="fees-section" *ngIf="fees.length > 0">
+            <h3>Fees</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fee Type</th>
+                        <th>Due Amount</th>
+                        <th>Paid Amount</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let fee of fees">
+                        <td>{{ fee.feeType }}</td>
+                        <td>{{ fee.totalAmount - fee.paidAmount | currency:'INR' }}</td>
+                        <td>{{ fee.paidAmount | currency:'INR' }}</td>
+                        <td>{{ fee.totalAmount | currency:'INR'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>

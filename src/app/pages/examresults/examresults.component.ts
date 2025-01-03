@@ -6,6 +6,7 @@ import * as bootstrap from 'bootstrap';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { debounceTime, Subject } from 'rxjs';
 import { ExamResultRequest, ExamResultResponse, ExamResultService } from '../../services/admin/examresult.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-exam-results',
@@ -45,7 +46,7 @@ export class ExamresultsComponent implements OnInit {
 
   private searchSubject = new Subject<void>();
 
-  constructor(private examResultService: ExamResultService, private router: Router) {
+  constructor(private examResultService: ExamResultService, private router: Router, private authService: AuthService) {
     // Setup debounced search
     this.searchSubject.pipe(
       debounceTime(500)
@@ -233,5 +234,10 @@ export class ExamresultsComponent implements OnInit {
       subject: '',
       student: { id: 0 }
     };
+  }
+
+  navigateToHome(): void {
+    const dashboardRoute = this.authService.getDashboardRoute();
+    this.router.navigate([dashboardRoute]);
   }
 }

@@ -19,7 +19,7 @@ export const routes: Routes = [
     { path: "m-employee", component: EmployeeComponent },
     { path: "m-student", component: StudentComponent },
     { path: "m-fees", component: FeesComponent },
-    { path: "m-results", component: ExamresultsComponent },
+    { path: "m-results", component: ExamresultsComponent, canActivate: [authGuard], data: { role: ['ROLE_ADMIN', 'ROLE_EMPLOYEE'] } },
     { path: "m-salary", component: SalaryComponent },
 
     {

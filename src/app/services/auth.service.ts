@@ -40,7 +40,7 @@ export class AuthService {
         this.logout();
       }
       console.log('checking for token expiration...');
-      
+
     }, 300 * 100); // Check every 30 seconds (you can adjust the interval)
   }
 
@@ -68,5 +68,29 @@ export class AuthService {
     this.stopTokenExpirationCheck();
     localStorage.removeItem('token');
     this.router.navigateByUrl('/login');
+  }
+
+  getUserRole(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Assuming your JWT token has a 'role' claim
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.role;
+    }
+    return '';
+  }
+
+  getDashboardRoute(): string {
+    const role = this.getUserRole();
+    switch (role) {
+      case 'ROLE_ADMIN':
+        return '/admindashboard';
+      case 'ROLE_EMPLOYEE':
+        return '/employeedashboard';
+      case 'ROLE_STUDENT':
+        return '/studentdashboard';
+      default:
+        return '/login';
+    }
   }
 }
