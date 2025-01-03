@@ -15,8 +15,8 @@ export class ExamResultService {
   }
 
   getAllExamResults(
-    page: number,
-    size: number,
+    page: number, 
+    size: number, 
     searchParams?: {
       studentId?: string,
       examType?: string,
@@ -39,11 +39,6 @@ export class ExamResultService {
 
     return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/results/getall`, { params });
   }
-
-  getExamResultById(resultId: number): Observable<ExamResultResponse> {
-    return this.http.get<ExamResultResponse>(`${this.baseUrl}/results/get/${resultId}`);
-  }
-
 
   getStudentExamResults(studentId: number, page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
     return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/student/student-id/${studentId}/exam-results?page=${page}&size=${size}`);
