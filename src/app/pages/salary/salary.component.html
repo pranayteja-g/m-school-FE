@@ -4,96 +4,110 @@
   <h2 class="mb-4 text-center">Employee Salary Management</h2>
 
   <!-- Search Section -->
-  <div class="card mb-4 p-3">
-    <h3>Search Salary</h3>
-    <div class="form-group">
-      <label for="searchEmployeeId">Employee ID:</label>
-      <div class="d-flex">
-        <input 
-          [(ngModel)]="searchEmployeeId" 
-          name="searchEmployeeId" 
-          type="number" 
-          class="form-control" 
-          placeholder="Enter Employee ID"
-        />
-        <button (click)="searchByEmployeeId()" class="btn btn-primary ml-2">Search</button>
+  <div *ngIf="authService.getUserRole() === 'ROLE_ADMIN'">
+    <div class="card mb-4 p-3">
+      <h3>Search Salary</h3>
+      <div class="form-group">
+        <label for="searchEmployeeId">Employee ID:</label>
+        <div class="d-flex">
+          <input [(ngModel)]="searchEmployeeId" name="searchEmployeeId" type="number" class="form-control"
+            placeholder="Enter Employee ID" />
+          <button (click)="searchByEmployeeId()" class="btn btn-primary ml-2">Search</button>
+        </div>
       </div>
     </div>
   </div>
+
 
   <!-- Date Filter Section -->
   <div class="card mb-4 p-3">
     <h3>Filter by Date</h3>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-md-3">
         <div class="form-group">
           <label for="startDate">Start Date:</label>
-          <input 
-            [(ngModel)]="startDate" 
-            type="date" 
-            class="form-control" 
-            name="startDate"
-          />
+          <input [(ngModel)]="startDate" type="date" class="form-control" name="startDate" />
         </div>
       </div>
-      <div class="col-md-5">
+      <div class="col-md-3">
         <div class="form-group">
           <label for="endDate">End Date:</label>
-          <input 
-            [(ngModel)]="endDate" 
-            type="date" 
-            class="form-control" 
-            name="endDate"
-          />
+          <input [(ngModel)]="endDate" type="date" class="form-control" name="endDate" />
         </div>
       </div>
       <div class="col-md-2 d-flex align-items-end">
-        <button (click)="filterSalariesByDate()" class="btn btn-primary">Filter</button>
+        <button (click)="filterSalariesByDate()" class="btn btn-primary mt-2">Filter</button>
       </div>
     </div>
   </div>
 
   <!-- Create Salary Section -->
-  <div class="card mb-4 p-3">
-    <h3>Create New Salary</h3>
-    <form #createForm="ngForm" (ngSubmit)="createSalary(createForm)">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="employeeId">Employee ID:</label>
-            <input 
-              [(ngModel)]="newSalary.employee.id" 
-              name="employeeId" 
-              type="number" 
-              class="form-control" 
-              required
-            />
+  <div *ngIf="authService.getUserRole() === 'ROLE_ADMIN'">
+    <div class="card mb-4 p-3">
+      <h3>Create New Salary</h3>
+      <form #createForm="ngForm" (ngSubmit)="createSalary(createForm)">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="employeeId">Employee ID:</label>
+              <input [(ngModel)]="newSalary.employee.id" name="employeeId" type="number" class="form-control"
+                required />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="amount">Salary Amount:</label>
+              <input [(ngModel)]="newSalary.salaryAmount" name="amount" type="number" class="form-control" required />
+            </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="amount">Salary Amount:</label>
-            <input 
-              [(ngModel)]="newSalary.salaryAmount" 
-              name="amount" 
-              type="number" 
-              class="form-control" 
-              required
-            />
-          </div>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-success mt-3" [disabled]="!createForm.valid">
-        Create Salary
-      </button>
-    </form>
+        <button type="submit" class="btn btn-success mt-3" [disabled]="!createForm.valid">
+          Create Salary
+        </button>
+      </form>
+    </div>
   </div>
 
+
   <!-- Salary List -->
+  <div *ngIf="authService.getUserRole() === 'ROLE_ADMIN'">
+    <div class="card p-3">
+      <h3>Salary Records</h3>
+      <div *ngIf="salaries.length > 0; else noSalaries" class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Employee ID</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let salary of salaries">
+              <td>{{salary.id}}</td>
+              <td>{{salary.employeeDto?.id}}</td>
+              <td>{{salary.salaryAmount | currency}}</td>
+              <td>{{salary.createdDate | date:'mediumDate'}}</td>
+              <td>
+                <button class="btn btn-sm btn-primary mr-2" (click)="editSalary(salary)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteSalary(salary.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noSalaries>
+        <div class="alert alert-info">No salary records found.</div>
+      </ng-template>
+    </div>
+  </div>
+
   <div class="card p-3">
     <h3>Salary Records</h3>
     <div *ngIf="salaries.length > 0; else noSalaries" class="table-responsive">
-      <table class="table table-striped">
+      <table class="table table-striped table-hover">
         <thead>
           <tr>
             <th>ID</th>
@@ -104,15 +118,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let salary of salaries">
+          <tr *ngFor="let salary of employeeSalaries">
             <td>{{salary.id}}</td>
             <td>{{salary.employeeDto?.id}}</td>
-            <td>{{salary.salaryAmount | currency}}</td>
+            <td>{{salary.salaryAmount | currency: 'INR'}}</td>
             <td>{{salary.createdDate | date:'mediumDate'}}</td>
-            <td>
-              <button class="btn btn-sm btn-primary mr-2" (click)="editSalary(salary)">Edit</button>
-              <button class="btn btn-sm btn-danger" (click)="deleteSalary(salary.id)">Delete</button>
-            </td>
           </tr>
         </tbody>
       </table>
@@ -124,7 +134,7 @@
 
   <!-- Edit Modal -->
   <div *ngIf="editMode" class="modal show d-block" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Edit Salary</h5>
@@ -136,23 +146,13 @@
           <form #editForm="ngForm">
             <div class="form-group">
               <label>Salary ID:</label>
-              <input 
-                [(ngModel)]="editSalaryData.employee.id" 
-                name="editEmployeeId" 
-                type="number" 
-                class="form-control" 
-                required
-              />
+              <input [(ngModel)]="editSalaryData.employee.id" name="editEmployeeId" type="number" class="form-control"
+                required />
             </div>
             <div class="form-group">
               <label>Salary Amount:</label>
-              <input 
-                [(ngModel)]="editSalaryData.salaryAmount" 
-                name="editAmount" 
-                type="number" 
-                class="form-control" 
-                required
-              />
+              <input [(ngModel)]="editSalaryData.salaryAmount" name="editAmount" type="number" class="form-control"
+                required />
             </div>
           </form>
         </div>

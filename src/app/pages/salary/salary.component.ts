@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CreateSalaryDto, Salary, SalaryService } from '../../services/admin/salary.service';
 import { NavbarComponent } from "../navbar/navbar.component";
+import * as bootstrap from 'bootstrap';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-salary',
@@ -12,15 +14,20 @@ import { NavbarComponent } from "../navbar/navbar.component";
   styleUrls: ['./salary.component.css']
 })
 export class SalaryComponent implements OnInit {
+
   salaries: Salary[] = [];
   startDate: string = '';
   endDate: string = '';
   searchEmployeeId: number | null = null;
 
+  action: 'create' | 'update' = 'create';
+
   newSalary: CreateSalaryDto = {
     salaryAmount: 0,
     employee: { id: 0 }
   };
+
+  createMode = false;
 
   editMode = false;
   editSalaryData: CreateSalaryDto = {
@@ -28,10 +35,45 @@ export class SalaryComponent implements OnInit {
     employee: { id: 0 }
   };
 
-  constructor(private readonly salaryService: SalaryService) {}
+  employeeId: number = 0;
+  employeeSalaries: Salary[] = [];
+
+  constructor(private readonly salaryService: SalaryService, public authService: AuthService) { }
 
   ngOnInit(): void {
-    this.getAllSalaries();
+    this.employeeId = Number(this.authService.getUserIdFromToken());
+    const userRole = this.authService.getUserRole();
+    if (userRole === 'ROLE_ADMIN') {
+      this.getAllSalaries();
+    } else {
+      this.getSalaryByEmployeeId(this.employeeId);
+    }
+  }
+
+  populateSalaryForUpdate(feeId: number) {
+    throw new Error('Method not implemented.');
+  }
+  resetForm() {
+    salaryAmount: 0;
+    employee: { id: 0 };
+  }
+
+  openModal(modalId: string, action: 'create') {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    } else {
+      this.resetForm();
+    }
+  }
+
+  closeModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      modal?.hide();
+    }
   }
 
   getAllSalaries(): void {
@@ -44,7 +86,20 @@ export class SalaryComponent implements OnInit {
     });
   }
 
+  getSalaryByEmployeeId(employeeId: number): void {
+    console.log('Employee ID:', this.employeeId);
+
+    this.salaryService.getSalaryByEmployeeId(employeeId).subscribe({
+      next: (data) => this.employeeSalaries = data || [],
+      error: (err) => {
+        console.error('Error fetching salary by employee ID:', err);
+        alert('No records found for the given Employee ID.');
+      }
+    });
+  }
+
   createSalary(form: NgForm): void {
+    this.createMode = true;
     if (form.valid) {
       this.salaryService.createSalary(this.newSalary).subscribe({
         next: () => {
@@ -55,6 +110,11 @@ export class SalaryComponent implements OnInit {
         error: (err) => console.error('Error creating salary:', err)
       });
     }
+  }
+
+  cancelCreate(): void {
+    this.createMode = false;
+    this.resetNewSalary();
   }
 
   editSalary(salary: Salary): void {
