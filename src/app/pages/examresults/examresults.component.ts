@@ -57,23 +57,44 @@ export class ExamresultsComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchExamResults();
-    this.updateDisplayedResults();
   }
 
-  onSearch(): void {
+  fetchExamResults(): void {
     const { studentId, examType, studentClass, section, subject } = this.searchCriteria;
+    this.isLoading = true;
 
-    this.filteredExamResults = this.examResults.filter((result) => {
-      return (
-        (!studentId || result.studentDto.id.toString().includes(studentId)) &&
-        (!examType || result.examType.toLowerCase().includes(examType.toLowerCase())) &&
-        (!studentClass || result.studentDto.studentClass.toLowerCase().includes(studentClass.toLowerCase())) &&
-        (!section || result.studentDto.section.toLowerCase().includes(section.toLowerCase())) &&
-        (!subject || result.subject.toLowerCase().includes(subject.toLowerCase()))
-      );
+    this.examResultService.getAllExamResults(this.currentPage, this.itemsPerPage, {
+      studentId,
+      examType,
+      studentClass,
+      section,
+      subject
+    }).subscribe(response => {
+      this.examResults = response.content;
+      this.totalPages = response.totalPages;
+      this.totalElements = response.totalElements;
+      this.filteredExamResults = this.examResults; // Display results initially
+      this.isLoading = false;
+    }, error => {
+      console.error('Error fetching exam results', error);
+      this.isLoading = false;
     });
   }
 
+  onSearch(): void {
+    this.searchSubject.next(); // Trigger search with debounced time
+  }
+
+  resetSearch(): void {
+    this.searchCriteria = {
+      studentId: '',
+      examType: '',
+      studentClass: '',
+      section: '',
+      subject: ''
+    };
+    this.fetchExamResults();
+  }
 
   openModal(modalId: string, action: 'create' | 'update', resultId?: number): void {
     const modalElement = document.getElementById(modalId);
@@ -91,6 +112,43 @@ export class ExamresultsComponent implements OnInit {
     }
   }
 
+  populateResultDataForUpdate(resultId: number): void {
+    this.isLoading = true; // Start loading spinner
+
+    this.examResultService.getExamResultById(resultId).subscribe(
+      (examResult: ExamResultResponse) => {
+        // Populate form fields with the fetched result
+        this.examResultRequest = {
+          id: examResult.id,
+          examType: examResult.examType,
+          totalMarks: examResult.totalMarks,
+          marksObtained: examResult.marksObtained,
+          subject: examResult.subject,
+          student: {
+            id: examResult.studentDto.id
+          }
+        };
+
+        this.isLoading = false; // Stop loading spinner
+      },
+      (error) => {
+        console.error('Error fetching exam result:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  resetForm(): void {
+    // Reset the form fields to initial empty or default values
+    this.examResultRequest = {
+      examType: '',
+      totalMarks: 0,
+      marksObtained: 0,
+      subject: '',
+      student: { id: 0 }
+    };
+  }
+
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
@@ -102,14 +160,12 @@ export class ExamresultsComponent implements OnInit {
   createExamResult(): void {
     this.examResultService.createExamResult(this.examResultRequest).subscribe(
       response => {
-        this.message = 'Exam result created successfully';
-        this.fetchExamResults();
+        this.message = 'Exam result created successfully!';
+        this.fetchExamResults(); // Refresh exam results
         this.closeModal('examResultModal');
-        alert('Exam result created successfully');
       },
       error => {
-        console.error('Error creating exam result:', error);
-        this.message = 'Error creating exam result';
+        console.error('Error creating exam result', error);
       }
     );
   }
@@ -117,105 +173,25 @@ export class ExamresultsComponent implements OnInit {
   updateExamResult(): void {
     if (this.resultIdToUpdate === null) return;
 
-    const updatedRequest: ExamResultRequest = {
-      ...this.examResultRequest,
-      id: this.resultIdToUpdate
-    };
-
-    this.examResultService.updateExamResult(updatedRequest).subscribe(
+    this.examResultService.updateExamResult(this.examResultRequest).subscribe(
       response => {
-        this.message = 'Exam result updated successfully';
-        this.fetchExamResults();
+        this.message = 'Exam result updated successfully!';
+        this.fetchExamResults(); // Refresh exam results
         this.closeModal('examResultModal');
-        alert('Exam result updated successfully');
       },
       error => {
-        console.error('Error updating exam result:', error);
-        this.message = 'Error updating exam result';
+        console.error('Error updating exam result', error);
       }
     );
   }
 
-  deleteExamResult(resultId: number): void {
-    if (confirm('Are you sure you want to delete this exam result?')) {
-      this.examResultService.deleteExamResult(resultId).subscribe(
-        () => {
-          this.message = 'Exam result deleted successfully';
-          alert('Exam result deleted successfully');
-          this.fetchExamResults();
-        },
-        error => {
-          console.error('Error deleting exam result:', error);
-          this.message = 'Error deleting exam result';
-        }
-      );
-    }
-  }
-
-  populateResultDataForUpdate(resultId: number): void {
-    const resultToEdit = this.examResults.find(r => r.id === resultId);
-    if (resultToEdit) {
-      this.examResultRequest = {
-        examType: resultToEdit.examType,
-        totalMarks: resultToEdit.totalMarks,
-        marksObtained: resultToEdit.marksObtained,
-        subject: resultToEdit.subject,
-        student: {
-          id: resultToEdit.studentDto.id
-        }
-      };
-    }
-  }
-  fetchExamResults(): void {
-    this.isLoading = true;
-
-    this.examResultService.getAllExamResults(this.currentPage, this.itemsPerPage, {})
-      .subscribe({
-        next: (response) => {
-          this.examResults = response.content; // API response for the current page
-          this.totalPages = response.totalPages;
-          this.totalElements = response.totalElements;
-          this.filteredExamResults = this.examResults; // No slicing required here
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching exam results:', err);
-          this.isLoading = false;
-        }
-      });
-  }
-
-  clearSearch(): void {
-    this.searchCriteria = {
-      studentId: '',
-      examType: '',
-      studentClass: '',
-      section: '',
-      subject: ''
-    };
-    this.currentPage = 0;
-    this.fetchExamResults();
-  }
-
-  updateDisplayedResults(): void {
-    const startIndex = this.currentPage * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-
-    // Slice the filteredExamResults array for current page
-    this.filteredExamResults = this.examResults.slice(startIndex, endIndex);
-  }
-
-
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.fetchExamResults();
-  }
-
-  goToNextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.fetchExamResults();
-    }
+  deleteExamResult(examResultId: number): void {
+    this.examResultService.deleteExamResult(examResultId).subscribe(() => {
+      this.message = 'Exam result deleted successfully!';
+      this.fetchExamResults(); // Refresh exam results
+    }, error => {
+      console.error('Error deleting exam result', error);
+    });
   }
 
   goToPreviousPage(): void {
@@ -225,13 +201,10 @@ export class ExamresultsComponent implements OnInit {
     }
   }
 
-  resetForm(): void {
-    this.examResultRequest = {
-      examType: '',
-      totalMarks: 0,
-      marksObtained: 0,
-      subject: '',
-      student: { id: 0 }
-    };
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.fetchExamResults();
+    }
   }
 }
