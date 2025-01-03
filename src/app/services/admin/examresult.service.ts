@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -15,8 +15,8 @@ export class ExamResultService {
   }
 
   getAllExamResults(
-    page: number, 
-    size: number, 
+    page: number,
+    size: number,
     searchParams?: {
       studentId?: string,
       examType?: string,
@@ -40,8 +40,21 @@ export class ExamResultService {
     return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/results/getall`, { params });
   }
 
-  getStudentExamResults(studentId: number, page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
-    return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/student/student-id/${studentId}/exam-results?page=${page}&size=${size}`);
+  getStudentExamResults(
+    studentId: number,
+    page: number = 0,
+    size: number = 10
+  ): Observable<Page<ExamResultDto>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<ExamResultDto>>(
+      `${this.baseUrl}/student/student-id/${studentId}/exam-results`,
+      {
+        params
+      }
+    );
   }
 
   updateExamResult(examResult: ExamResultRequest): Observable<ExamResultResponse> {
@@ -85,4 +98,34 @@ interface PageResponse<T> {
   totalElements: number;
   size: number;
   number: number;
+}
+
+export interface ExamResultDto {
+  id: number;
+  examType: string;
+  totalMarks: number;
+  marksObtained: number;
+  subject: string;
+  studentDto: {
+    id: number;
+    name: string;
+    studentClass: string;
+    section: string;
+    rollNo: string;
+  };
+}
+
+export interface Page<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+  };
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 }

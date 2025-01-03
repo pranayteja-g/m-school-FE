@@ -1,0 +1,72 @@
+// student-dashboard.component.html
+<app-navbar></app-navbar>
+<div class="dashboard-container">
+    <div *ngIf="loading" class="loading">Loading...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <h2 *ngIf="studentProfile.name">Welcome, {{ studentProfile.name }}</h2>
+
+    <!-- Profile Section -->
+    <div class="profile-section" *ngIf="studentProfile">
+        <h3>Profile</h3>
+        <p><strong>Name: </strong> {{ studentProfile.name }}</p>
+        <p><strong>Class: </strong> {{ studentProfile.studentClass }}</p>
+        <p><strong>Section: </strong> {{ studentProfile.section }}</p>
+        <p><strong>Roll-no: </strong> {{ studentProfile.rollNo }}</p>
+    </div>
+
+    <!-- Exam Results Section -->
+    <div class="exam-results-section" *ngIf="examResults.length > 0">
+        <h3>Exam Results</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Type</th>
+                    <th>Marks Obtained</th>
+                    <th>Total Marks</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let result of examResults">
+                    <td>{{ result.subject }}</td>
+                    <td>{{ result.examType }}</td>
+                    <td>{{ result.marksObtained }}</td>
+                    <td>{{ result.totalMarks }}</td>
+                    <td>{{ (result.marksObtained / result.totalMarks * 100).toFixed(2) }}%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button [disabled]="currentPage === 0" (click)="changePage(-1)">Previous</button>
+            <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+            <button [disabled]="currentPage === totalPages - 1" (click)="changePage(1)">Next</button>
+        </div>
+    </div>
+
+    <!-- Fees Section -->
+    <div class="fees-section" *ngIf="fees.length > 0">
+        <h3>Fees</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fee Type</th>
+                    <th>Due Amount</th>
+                    <th>Paid Amount</th>
+                    <th>Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let fee of fees">
+                    <td>{{ fee.feeType }}</td>
+                    <td>{{ fee.totalAmount - fee.paidAmount | currency:'INR' }}</td>
+                    <td>{{ fee.paidAmount | currency:'INR' }}</td>
+                    <td>{{ fee.totalAmount | currency:'INR'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

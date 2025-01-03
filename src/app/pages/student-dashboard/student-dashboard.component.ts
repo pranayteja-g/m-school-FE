@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from "../navbar/navbar.component";
+import { HttpClient } from '@angular/common/http';
+import { ExamResultDto, ExamResultService, Page } from '../../services/admin/examresult.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -9,70 +13,85 @@ import { NavbarComponent } from "../navbar/navbar.component";
   styleUrl: './student-dashboard.component.css'
 })
 export class StudentDashboardComponent {
-  // studentProfile: any = {};
+  studentProfile: any = {};
+  examResults: ExamResultDto[] = [];
+  currentPage: number = 0;
+  pageSize: number = 10;
+  totalPages: number = 0;
+  fees: any[] = [];
+  loading: boolean = false;
+  error: string | null = null;
 
-  // examResultsForStudentId: any[] = [];
-  // examResults: any[] = [];
-  // currentPage: number = 0;
-  // pageSize: number = 10;
-  // totalPages: number = 0;
+  constructor(
+    private http: HttpClient,
+    private examResultService: ExamResultService,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
-  // fees: any[] = [];
+  ngOnInit(): void {
+    const studentId = this.authService.getUserId();
+    if (studentId) {
+      this.loadStudentProfile(studentId);
+      this.loadExamResults(studentId, this.currentPage, this.pageSize);
+      this.loadFees(studentId);
+    } else {
+      this.error = 'User ID not found';
+    }
+  }
 
-  // studentId !: number; // Get student ID from the token or a global service
+  loadStudentProfile(studentId: number): void {
+    this.loading = true;
+    this.http.get(`http://localhost:8080/student/id/${studentId}`).subscribe({
+      next: (data: any) => {
+        this.studentProfile = data;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.error = 'Error loading profile';
+        this.loading = false;
+        console.error('Error:', error);
+      }
+    });
+  }
 
-  // constructor(private http: HttpClient,
-  //   private examResultService: ExamResultService,
-  //   private router: Router,
-  //   private authService: AuthService
-  // ) { }
+  loadExamResults(studentId: number, page: number, size: number): void {
+    this.loading = true;
+    this.examResultService.getStudentExamResults(studentId, page, size).subscribe({
+      next: (data: Page<ExamResultDto>) => {
+        this.examResults = data.content;
+        this.totalPages = data.totalPages;
+        this.currentPage = data.number;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.error = 'Error loading exam results';
+        this.loading = false;
+        console.error('Error:', error);
+      }
+    });
+  }
 
-  // ngOnInit(): void {
-  //   const studentId = this.authService.getUserId(); // Get the userId from the AuthService
-  //   this.loadStudentProfile(studentId);
-  //   // this.getAllExamResultsByStudentId(studentId); // Pass the studentId directly here
-  //   this.loadFees(studentId);
-  // }
+  changePage(offset: number): void {
+    const newPage = this.currentPage + offset;
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.currentPage = newPage;
+      this.loadExamResults(this.authService.getUserId(), this.currentPage, this.pageSize);
+    }
+  }
 
-  // loadStudentProfile(studentId: number): void {
-  //   this.http.get(`http://localhost:8080/student/id/${studentId}`)
-  //     .subscribe((data: any) => {
-  //       this.studentProfile = data;
-  //     });
-  // }
-
-  // // // Fetch exam results using the new pagination method
-  // // getAllExamResultsByStudentId(studentId: number): void {
-  // //   // Remove the this.studentId check since we know we have a valid ID
-  // //   this.examResultService.getExamResultsByStudentId(
-  // //     studentId,
-  // //     this.currentPage,
-  // //     this.pageSize
-  // //   ).subscribe({
-  // //     next: (data) => {
-  // //       this.examResultsForStudentId = data.content || [];
-  // //       this.totalPages = data.totalPages || 0;
-  // //     },
-  // //     error: (err) => {
-  // //       console.error('Error fetching exam results:', err);
-  // //     }
-  // //   });
-  // // }
-
-  // // changePage(offset: number): void {
-  // //   const newPage = this.currentPage + offset;
-  // //   if (newPage >= 0 && newPage < this.totalPages) {
-  // //     this.currentPage = newPage;
-  // //     this.getAllExamResultsByStudentId(this.studentId);
-  // //   }
-  // // }
-
-
-
-  // loadFees(studentId: number): void {
-  //   this.http.get(`http://localhost:8080/student/fees/${studentId}`)
-  //     .subscribe((data: any) => {
-  //       this.fees = data;
-  //     });
-  // }
+  loadFees(studentId: number): void {
+    this.loading = true;
+    this.http.get(`http://localhost:8080/student/fees/${studentId}`).subscribe({
+      next: (data: any) => {
+        this.fees = data;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.error = 'Error loading fees';
+        this.loading = false;
+        console.error('Error:', error);
+      }
+    });
+  }
 }
