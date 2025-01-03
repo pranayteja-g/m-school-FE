@@ -84,6 +84,7 @@ export class NavbarComponent implements OnInit {
       return [
         { name: 'Home', path: '/employeedashboard' },
         { name: 'Results', path: '/m-results' },
+        // { name: 'salary', path: '/m-salary' },
       ];
     }
 

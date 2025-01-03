@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from "jwt-decode";
 
+interface DecodedToken {
+  id: string; // Adjust the type to match what you expect from your token
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +25,26 @@ export class AuthService {
   }
 
   getUserId(): number {
+    console.log('User ID in AuthService: ', this.userId);
     return this.userId;
+  }
+
+  getUserIdFromToken(): string | null {
+    const token = localStorage.getItem('jwtToken');
+
+    if (!token) {
+      console.log('No token found');
+      return null;  // Handle no token case
+    }
+
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(token);  // Type the decoded token
+      return decodedToken.id;  // Access 'id' field safely
+      console.log('User ID in AuthService: ', decodedToken.id);
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;  // Handle error case
+    }
   }
   setUserId(userId: number) {
     this.userId = userId;
