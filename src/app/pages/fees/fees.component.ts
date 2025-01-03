@@ -111,6 +111,7 @@ export class FeesComponent implements OnInit {
       this.feeService.deleteFee(feeId).subscribe(
         response => {
           this.message = 'Fee deleted successfully';
+          alert('Fee deleted successfully');
           this.fetchAllFees();
         },
         error => {

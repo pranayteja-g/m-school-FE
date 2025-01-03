@@ -1,51 +1,66 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ExamresultService {
-
-  private baseUrl = 'http://localhost:8080/results';
+export class ExamResultService {
+  private baseUrl = 'http://localhost:8080';
 
   constructor(private http: HttpClient) { }
 
-  createExamResult(examResult: ExamResult) {
-    return this.http.post<ExamResult[]>(`${this.baseUrl}/create`, examResult);
+  createExamResult(examResult: Omit<ExamResultRequest, 'id'>): Observable<ExamResultResponse> {
+    return this.http.post<ExamResultResponse>(`${this.baseUrl}/results/create`, examResult);
   }
 
-  getExamResults(page: number, size: number): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<any>(`http://localhost:8080/results/getall`, { params });
+  getAllExamResults(page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
+    return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/results/getall?page=${page}&size=${size}`);
   }
 
-  getAllExamResultsByStudentId(studentId: number, page: number, size: number): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<any>(`http://localhost:8080/student/student-id/${studentId}/exam-results`, { params });
+  getStudentExamResults(studentId: number, page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
+    return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/student/student-id/${studentId}/exam-results?page=${page}&size=${size}`);
   }
 
-  updateExamResult(id: number, examResult: ExamResult) {
-    return this.http.put<ExamResult[]>(`${this.baseUrl}/update/${id}`, examResult);
+  updateExamResult(examResult: ExamResultRequest): Observable<ExamResultResponse> {
+    return this.http.put<ExamResultResponse>(`${this.baseUrl}/results/update/${examResult.id}`, examResult);
   }
 
-  deleteExamResult(examResultId: number) {
-    return this.http.delete<ExamResult[]>(`${this.baseUrl}/delete/${examResultId}`);
+  deleteExamResult(examResultId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/results/delete/${examResultId}`);
   }
 }
 
-export interface ExamResult {
+export interface ExamResultResponse {
   id: number;
-  studentId: number;
   examType: string;
-  marksObtained: number;
   totalMarks: number;
+  marksObtained: number;
+  subject: string;
+  studentDto: {
+    id: number;
+    name: string;
+    studentClass: string;
+    section: string;
+    rollNo: string;
+  };
 }
-export interface Student {
-  id: number;
-  name: string;
+
+export interface ExamResultRequest {
+  id?: number;
+  examType: string;
+  totalMarks: number;
+  marksObtained: number;
+  subject: string;
+  student: {
+    id: number;
+  };
+}
+
+interface PageResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
 }
