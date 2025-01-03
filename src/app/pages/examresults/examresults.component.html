@@ -1,14 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exam Results Manager</title>
-</head>
-<body>
-  <app-navbar></app-navbar>
+<app-navbar></app-navbar>
 
-  <h3 class="text-center mt-5">Exam Results</h3>
+<h3 class="text-center mt-5">Exam Results</h3>
+
+<div class="container mt-2">
+  <!-- Search Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Search Filters</h5>
+      <div class="row g-3">
+        <div class="col-md">
+          <input type="text" class="form-control" placeholder="Student ID" [(ngModel)]="searchCriteria.studentId"
+            (ngModelChange)="onSearch()">
+        </div>
+        <div class="col-md">
+          <input type="text" class="form-control" placeholder="Exam Type" [(ngModel)]="searchCriteria.examType"
+            (ngModelChange)="onSearch()">
+        </div>
+        <div class="col-md">
+          <input type="text" class="form-control" placeholder="Class" [(ngModel)]="searchCriteria.studentClass"
+            (ngModelChange)="onSearch()">
+        </div>
+        <div class="col-md">
+          <input type="text" class="form-control" placeholder="Section" [(ngModel)]="searchCriteria.section"
+            (ngModelChange)="onSearch()">
+        </div>
+        <div class="col-md">
+          <input type="text" class="form-control" placeholder="Subject" [(ngModel)]="searchCriteria.subject"
+            (ngModelChange)="onSearch()">
+        </div>
+        <div class="col-md-auto">
+          <button class="btn btn-secondary" (click)="clearSearch()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Button to open create exam result modal -->
   <div class="container mt-2">
@@ -20,7 +45,8 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="examResultModalLabel">{{ action === 'create' ? 'Create' : 'Update' }} Exam Result</h5>
+          <h5 class="modal-title" id="examResultModalLabel">{{ action === 'create' ? 'Create' : 'Update' }} Exam
+            Result</h5>
           <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -83,7 +109,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let result of examResults">
+          <tr *ngFor="let result of filteredExamResults">
             <td>{{ result.id }}</td>
             <td>{{ result.studentDto.name || 'N/A' }}</td>
             <td>{{ result.subject }}</td>
@@ -92,13 +118,14 @@
             <td>{{ result.marksObtained }}</td>
             <td>{{ (result.marksObtained / result.totalMarks * 100).toFixed(2) }}%</td>
             <td>
-              <button class="btn btn-secondary me-2" (click)="openModal('examResultModal', 'update', result.id)">Update</button>
+              <button class="btn btn-secondary me-2"
+                (click)="openModal('examResultModal', 'update', result.id)">Update</button>
               <button class="btn btn-danger" (click)="deleteExamResult(result.id)">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
-      
+
       <!-- Message if no results are found -->
       <div *ngIf="!isLoading && examResults.length === 0" class="alert alert-info">
         <p class="text-center">No exam results found</p>
@@ -106,13 +133,15 @@
     </div>
 
     <!-- Pagination controls -->
-    <div class="d-flex justify-content-center mt-3">
-      <button class="btn btn-secondary me-2" (click)="goToPreviousPage()"
-        [disabled]="currentPage === 0">Previous</button>
-      <span class="mx-2 pt-2">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-      <button class="btn btn-secondary ms-2" (click)="goToNextPage()"
-        [disabled]="currentPage === totalPages - 1">Next</button>
+    <div class="d-flex justify-content-center mt-3" *ngIf="totalPages > 1">
+      <button class="btn btn-secondary me-2" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
+        Previous
+      </button>
+      <span class="mx-2 pt-2">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </span>
+      <button class="btn btn-secondary ms-2" (click)="goToNextPage()" [disabled]="currentPage === totalPages - 1">
+        Next
+      </button>
     </div>
   </div>
-</body>
-</html>

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { ExamResultRequest, ExamResultResponse, ExamResultService } from '../../services/admin/examresult.service';
+import { debounceTime, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-exam-results',
@@ -22,21 +23,57 @@ export class ExamresultsComponent implements OnInit {
     student: { id: 0 }
   };
 
-  examResults: ExamResultResponse[] = [];
+  searchCriteria = {
+    studentId: '',
+    examType: '',
+    studentClass: '',
+    section: '',
+    subject: ''
+  };
+
+  examResults: ExamResultResponse[] = []; // Original results fetched from the backend
+  filteredExamResults: ExamResultResponse[] = []; // Results after filtering
+  isLoading: boolean = false;
+
   currentPage: number = 0;
   itemsPerPage: number = 5;
   totalPages: number = 0;
   totalElements: number = 0;
-  isLoading: boolean = true;
   action: 'create' | 'update' = 'create';
   message: string = '';
   resultIdToUpdate: number | null = null;
 
-  constructor(private examResultService: ExamResultService, private router: Router) { }
+  private searchSubject = new Subject<void>();
+
+  constructor(private examResultService: ExamResultService, private router: Router) {
+    // Setup debounced search
+    this.searchSubject.pipe(
+      debounceTime(500)
+    ).subscribe(() => {
+      this.currentPage = 0; // Reset to first page when searching
+      this.fetchExamResults();
+    });
+  }
 
   ngOnInit(): void {
     this.fetchExamResults();
+    this.updateDisplayedResults();
   }
+
+  onSearch(): void {
+    const { studentId, examType, studentClass, section, subject } = this.searchCriteria;
+
+    this.filteredExamResults = this.examResults.filter((result) => {
+      return (
+        (!studentId || result.studentDto.id.toString().includes(studentId)) &&
+        (!examType || result.examType.toLowerCase().includes(examType.toLowerCase())) &&
+        (!studentClass || result.studentDto.studentClass.toLowerCase().includes(studentClass.toLowerCase())) &&
+        (!section || result.studentDto.section.toLowerCase().includes(section.toLowerCase())) &&
+        (!subject || result.subject.toLowerCase().includes(subject.toLowerCase()))
+      );
+    });
+  }
+
 
   openModal(modalId: string, action: 'create' | 'update', resultId?: number): void {
     const modalElement = document.getElementById(modalId);
@@ -129,21 +166,49 @@ export class ExamresultsComponent implements OnInit {
       };
     }
   }
-
   fetchExamResults(): void {
     this.isLoading = true;
-    this.examResultService.getAllExamResults(this.currentPage, this.itemsPerPage).subscribe(
-      response => {
-        this.examResults = response.content;
-        this.totalPages = response.totalPages;
-        this.totalElements = response.totalElements;
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error fetching exam results:', error);
-        this.isLoading = false;
-      }
-    );
+
+    this.examResultService.getAllExamResults(this.currentPage, this.itemsPerPage, {})
+      .subscribe({
+        next: (response) => {
+          this.examResults = response.content; // API response for the current page
+          this.totalPages = response.totalPages;
+          this.totalElements = response.totalElements;
+          this.filteredExamResults = this.examResults; // No slicing required here
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error fetching exam results:', err);
+          this.isLoading = false;
+        }
+      });
+  }
+
+  clearSearch(): void {
+    this.searchCriteria = {
+      studentId: '',
+      examType: '',
+      studentClass: '',
+      section: '',
+      subject: ''
+    };
+    this.currentPage = 0;
+    this.fetchExamResults();
+  }
+
+  updateDisplayedResults(): void {
+    const startIndex = this.currentPage * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+
+    // Slice the filteredExamResults array for current page
+    this.filteredExamResults = this.examResults.slice(startIndex, endIndex);
+  }
+
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.fetchExamResults();
   }
 
   goToNextPage(): void {

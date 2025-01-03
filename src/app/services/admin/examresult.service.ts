@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -14,8 +14,30 @@ export class ExamResultService {
     return this.http.post<ExamResultResponse>(`${this.baseUrl}/results/create`, examResult);
   }
 
-  getAllExamResults(page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
-    return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/results/getall?page=${page}&size=${size}`);
+  getAllExamResults(
+    page: number, 
+    size: number, 
+    searchParams?: {
+      studentId?: string,
+      examType?: string,
+      studentClass?: string,
+      section?: string,
+      subject?: string
+    }
+  ): Observable<PageResponse<ExamResultResponse>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (searchParams) {
+      Object.entries(searchParams).forEach(([key, value]) => {
+        if (value) {
+          params = params.set(key, value);
+        }
+      });
+    }
+
+    return this.http.get<PageResponse<ExamResultResponse>>(`${this.baseUrl}/results/getall`, { params });
   }
 
   getStudentExamResults(studentId: number, page: number, size: number): Observable<PageResponse<ExamResultResponse>> {
